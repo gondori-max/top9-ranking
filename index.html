@@ -117,12 +117,12 @@ function progress(n,total){
 
 /* =========================
    STEP1
-   71人 → 上位36人
+   71人 → 36人
 ========================= */
 
 function start(){
 
-  let a=shuffle(items);
+  const a=shuffle(items);
 
   s1Groups=[];
 
@@ -143,7 +143,7 @@ function start(){
 
 function renderS1(){
 
-  let g=s1Groups[s1i];
+  const g=s1Groups[s1i];
 
   progress(
     s1i,
@@ -163,10 +163,9 @@ function renderS1(){
     </p>
 
     <div class="grid">
-      ${g.map(x=>card(
-        x,
-        s1Selected.has(x.id)
-      )).join('')}
+      ${g.map(x=>
+        card(x,s1Selected.has(x.id))
+      ).join('')}
     </div>
 
     <div class="actions">
@@ -186,7 +185,7 @@ function renderS1(){
 
     el.onclick=()=>{
 
-      let id=+el.dataset.id;
+      const id=+el.dataset.id;
 
       if(s1Selected.has(id)){
 
@@ -217,6 +216,7 @@ function renderS1(){
     });
 
     s1i++;
+
     s1Selected=new Set();
 
 
@@ -237,7 +237,6 @@ function renderS1(){
 
 /* =========================
    STEP1終了
-   18人未満ならやり直し
 ========================= */
 
 function finishS1(){
@@ -247,6 +246,8 @@ function finishS1(){
       x=>scores.get(x.id)>0
     ).length;
 
+
+  /* 18人未満なら最初から */
 
   if(selectedCount<18){
 
@@ -290,7 +291,9 @@ function finishS1(){
   }
 
 
-  let ranked=
+  /* 上位36人を決定 */
+
+  const ranked=
     shuffle(items)
     .sort(
       (a,b)=>
@@ -299,12 +302,11 @@ function finishS1(){
     );
 
 
-  let top36=
+  const top36=
     ranked.slice(0,36);
 
 
   s2Groups=[];
-
 
   for(let i=0;i<36;i+=4){
 
@@ -331,11 +333,11 @@ function finishS1(){
 
 function renderS2First(){
 
-  let g=s2Groups[s2i];
+  const g=s2Groups[s2i];
 
   progress(
-    s1Groups.length+s2i,
-    s1Groups.length+s2Groups.length
+    25+s2i/9*25,
+    50
   );
 
 
@@ -394,12 +396,13 @@ function renderS2First(){
 
 
 /* =========================
-   STEP2・2位選択
+   STEP2
+   2位選択
 ========================= */
 
 function renderS2Second(){
 
-  let rem=
+  const rem=
     s2Groups[s2i]
     .filter(
       x=>x.id!==s2First.id
@@ -425,7 +428,7 @@ function renderS2Second(){
     <div class="actions">
 
       <button id="back">
-        STEP2の1位選択に戻る
+        1位選択に戻る
       </button>
 
     </div>
@@ -446,6 +449,7 @@ function renderS2Second(){
       );
 
       s2i++;
+
       s2First=null;
 
 
@@ -475,7 +479,7 @@ function renderS2Second(){
 
 
 /* =========================
-   STEP3対戦表作成
+   STEP3
 ========================= */
 
 function makeMatches(cands,rounds=4){
@@ -493,18 +497,19 @@ function makeMatches(cands,rounds=4){
     tries++<2000
   ){
 
-    let a=shuffle(cands);
+    const a=shuffle(cands);
+
     let pairs=[];
     let ok=true;
 
 
     for(let i=0;i<a.length;i+=2){
 
-      let x=a[i];
-      let y=a[i+1];
+      const x=a[i];
+      const y=a[i+1];
 
 
-      let key=[
+      const key=[
         Math.min(x.id,y.id),
         Math.max(x.id,y.id)
       ].join('-');
@@ -550,14 +555,9 @@ function makeMatches(cands,rounds=4){
 }
 
 
-/* =========================
-   STEP3開始
-========================= */
-
 function startFinal(){
 
-  finalCandidates=
-    s2Results;
+  finalCandidates=s2Results;
 
   finalWins=new Map(
     finalCandidates.map(
@@ -565,13 +565,11 @@ function startFinal(){
     )
   );
 
-
   finalMatches=
     makeMatches(
       finalCandidates,
       4
     );
-
 
   finalI=0;
 
@@ -586,9 +584,7 @@ function startFinal(){
 
 function renderFinal(){
 
-  if(
-    finalI>=finalMatches.length
-  ){
+  if(finalI>=finalMatches.length){
 
     finishFinal();
     return;
@@ -596,7 +592,7 @@ function renderFinal(){
   }
 
 
-  let m=
+  const m=
     finalMatches[finalI];
 
 
@@ -633,9 +629,7 @@ function renderFinal(){
     </div>
 
     <div class="notice">
-
       18候補がそれぞれ4回ずつ対戦します
-
     </div>
 
   `;
@@ -646,15 +640,13 @@ function renderFinal(){
 
     el.onclick=()=>{
 
-      let id=
+      const id=
         +el.dataset.id;
-
 
       finalWins.set(
         id,
         finalWins.get(id)+1
       );
-
 
       finalI++;
 
@@ -687,11 +679,11 @@ function finishFinal(){
 
 
   /*
-    写真配置
 
     4位 5位 6位
     2位 1位 3位
     7位 8位 9位
+
   */
 
   const photoOrder=[
@@ -716,8 +708,7 @@ function finishFinal(){
 
       ${photoOrder.map(index=>{
 
-        const x=
-          result[index];
+        const x=result[index];
 
         return `
 
