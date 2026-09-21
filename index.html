@@ -23,6 +23,44 @@ function renderS2Second(){let rem=s2Groups[s2i].filter(x=>x.id!==s2First.id);app
 function makeMatches(cands,rounds=4){let target=cands.length*rounds/2,matches=[],used=new Set(),tries=0;while(matches.length<target&&tries++<2000){let a=shuffle(cands),pairs=[],ok=true;for(let i=0;i<a.length;i+=2){let x=a[i],y=a[i+1],key=[Math.min(x.id,y.id),Math.max(x.id,y.id)].join('-');if(used.has(key)){ok=false;break}pairs.push({a:x,b:y,key})}if(ok)pairs.forEach(p=>{used.add(p.key);matches.push({a:p.a,b:p.b})})}while(matches.length<target){let a=shuffle(cands);for(let i=0;i<a.length&&matches.length<target;i+=2)matches.push({a:a[i],b:a[i+1]})}return shuffle(matches)}
 function startFinal(){finalCandidates=s2Results;finalWins=new Map(finalCandidates.map(x=>[x.id,0]));finalMatches=makeMatches(finalCandidates,4);finalI=0;renderFinal()}
 function renderFinal(){if(finalI>=finalMatches.length)return finishFinal();let m=finalMatches[finalI];progress(50+finalI/finalMatches.length*50,100);app.innerHTML=`<div class="stage">STEP 3 / 3</div><p class="instruction">どちらが好き？ <b>${finalI+1} / ${finalMatches.length}</b></p><div class="grid">${card(m.a)}${card(m.b)}</div><div class="notice">18候補がそれぞれ4回ずつ対戦します</div>`;document.querySelectorAll('.card').forEach(el=>el.onclick=()=>{let id=+el.dataset.id;finalWins.set(id,finalWins.get(id)+1);finalI++;renderFinal()})}
-function finishFinal(){let result=shuffle(finalCandidates).sort((a,b)=>finalWins.get(b.id)-finalWins.get(a.id));progress(100,100);app.innerHTML=`<div class="stage">🎉 あなたのTOP9 🎉</div><p class="instruction">最終STEPの勝利数をもとに決定しました</p><div class="results">${result.slice(0,9).map((x,i)=>`<div class="result-row"><div class="rank">${i+1}位</div><img src="${x.image}" onerror="imgError(this)"><div class="result-name">${x.name}</div><div class="wins">${finalWins.get(x.id)}勝</div></div>`).join('')}</div><div class="actions"><button onclick="location.reload()">もう一度やる</button></div>`}
+function finishFinal(){
+  const result = shuffle(finalCandidates)
+    .sort((a,b) => finalWins.get(b.id) - finalWins.get(a.id))
+    .slice(0,9);
+
+  setProgress(100,100);
+
+  // 写真の配置順：4位・5位・6位 / 2位・1位・3位 / 7位・8位・9位
+  const photoOrder = [3,4,5,1,0,2,6,7,8];
+
+  app.innerHTML = `
+    <div class="stage">🎉 あなたのTOP9 🎉</div>
+    <p class="instruction">あなたが選んだTOP9はこちら！</p>
+
+    <div class="top9-photo-grid">
+      ${photoOrder.map(index => {
+        const x = result[index];
+        return `
+          <div class="top9-photo">
+            <img src="${x.image}" onerror="imgError(this)">
+          </div>
+        `;
+      }).join("")}
+    </div>
+
+    <div class="ranking-list">
+      ${result.map((x,i) => `
+        <div class="ranking-item">
+          <span>${i+1}位</span>
+          <span>${x.name}</span>
+        </div>
+      `).join("")}
+    </div>
+
+    <div class="actions">
+      <button onclick="location.reload()">もう一度やる</button>
+    </div>
+  `;
+}
 start();
 </script></body></html>
