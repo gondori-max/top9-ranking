@@ -1034,105 +1034,54 @@ function makeMatches(
   cands,
   rounds=4
 ){
-  const target=
-    cands.length*
-    rounds/2;
-  let matches=[];
-  let used=new Set();
-  let tries=0;
+
+  const matches=[];
+  const used=new Set();
+
   /*
-    なるべく同じ組み合わせが
-    重複しないように作る
+    人数に関係なく、
+    1人につき4人の相手と対戦する
   */
-  while(
-    matches.length<target &&
-    tries++<2000
-  ){
-    const a=
-      shuffle(cands);
-    let pairs=[];
-    let ok=true;
-    for(
-      let i=0;
-      i<a.length;
-      i+=2
-    ){
-      const x=a[i];
-      const y=a[i+1];
+
+  const n=cands.length;
+
+  for(let offset=1; offset<=rounds/2; offset++){
+
+    for(let i=0; i<n; i++){
+
+      const j=
+        (i+offset)%n;
+
+      const x=cands[i];
+      const y=cands[j];
+
       const key=[
-        Math.min(
-          x.id,
-          y.id
-        ),
-        Math.max(
-          x.id,
-          y.id
-        )
+        Math.min(x.id,y.id),
+        Math.max(x.id,y.id)
       ].join('-');
-      if(
-        used.has(key)
-      ){
-        ok=false;
-        break;
-      }
-      pairs.push({
-        a:x,
-        b:y,
-        key:key
-      });
-    }
-    if(ok){
-      pairs.forEach(p=>{
-        used.add(p.key);
+
+      /*
+        同じ組み合わせは1回だけ
+      */
+      if(!used.has(key)){
+
+        used.add(key);
+
         matches.push({
-          a:p.a,
-          b:p.b
+          a:x,
+          b:y
         });
-      });
+
+      }
+
     }
+
   }
+
   /*
-    万一作れなかった場合の
-    最終補完
+    対戦順をランダムにする
   */
-  while(
-    matches.length<target
-  ){
-    const a=
-      shuffle(cands);
-    for(
-      let i=0;
-      i<a.length &&
-      matches.length<target;
-      i+=2
-    ){
-      matches.push({
-        a:a[i],
-        b:a[i+1]
-      });
-    }
-  }
   return shuffle(matches);
-}
-/* ==================================================
-   STEP3開始
-================================================== */
-function startFinal(){
-  finalCandidates=
-    s2Results;
-  finalWins=
-    new Map(
-      finalCandidates.map(
-        x=>[x.id,0]
-      )
-    );
-  finalMatches=
-    makeMatches(
-      finalCandidates,
-      4
-    );
-  finalI=0;
-  renderFinal();
 }
 /* ==================================================
    STEP3画面
