@@ -58,10 +58,11 @@ const items=Array.from({length:71},(_,i)=>({
 const app=document.getElementById('app');
 const bar=document.getElementById('progressBar');
 
-let s1Groups=[];
-let s1i=0;
-let s1Selected=new Set();
-let scores=new Map();
+let s1Groups=[],
+    s1i=0,
+    s1Selected=new Set(),
+    s1Choices=[],
+    scores=new Map();
 
 let s2Groups=[];
 let s2i=0;
@@ -122,7 +123,7 @@ function progress(n,total){
 
 function start(){
 
-  const a=shuffle(items);
+  let a=shuffle(items);
 
   s1Groups=[];
 
@@ -131,47 +132,46 @@ function start(){
   }
 
   s1i=0;
+
+  // 各4人グループで選んだ人を保存
+  s1Choices=s1Groups.map(()=>new Set());
+
   s1Selected=new Set();
 
-  scores=new Map(
-    items.map(x=>[x.id,0])
-  );
+  scores=new Map(items.map(x=>[x.id,0]));
 
-  renderS1();
-}
+ function renderS1(){
 
+  // このグループですでに選んでいた人を復元
+  s1Selected=new Set(s1Choices[s1i]);
 
-function renderS1(){
+  let g=s1Groups[s1i];
 
-  const g=s1Groups[s1i];
-
-  progress(
-    s1i,
-    s1Groups.length
-  );
+  progress(s1i,s1Groups.length);
 
   app.innerHTML=`
-    <div class="stage">
-      STEP 1 / 3
-    </div>
+    <div class="stage">STEP 1 / 3</div>
 
     <p class="instruction">
-      ${g.length}人の中から、
-      好きな人を
-      <b>0〜${g.length}人</b>
-      選んでください
+      4人の中から、好きな人を <b>0〜4人</b> 選んでください
     </p>
 
     <div class="grid">
-      ${g.map(x=>
-        card(x,s1Selected.has(x.id))
-      ).join('')}
+      ${g.map(x=>card(x,s1Selected.has(x.id))).join('')}
     </div>
 
     <div class="actions">
-      <button id="next">
-        次へ
-      </button>
+
+      ${
+        s1i > 0
+        ? `<button id="back" style="margin-right:10px;background:#777;">
+             ← 前の4人に戻る
+           </button>`
+        : ''
+      }
+
+      <button id="next">次へ</button>
+
     </div>
 
     <div class="notice">
@@ -180,12 +180,12 @@ function renderS1(){
   `;
 
 
-  document.querySelectorAll('.card')
-  .forEach(el=>{
+  // カードをクリック
+  document.querySelectorAll('.card').forEach(el=>{
 
     el.onclick=()=>{
 
-      const id=+el.dataset.id;
+      let id=+el.dataset.id;
 
       if(s1Selected.has(id)){
 
@@ -199,47 +199,68 @@ function renderS1(){
 
       }
 
+      // 現在の4人組の選択内容を保存
+      s1Choices[s1i]=new Set(s1Selected);
     };
 
   });
 
 
+  // 次へ
   document.getElementById('next').onclick=()=>{
 
-    s1Selected.forEach(id=>{
+    // 現在の選択を保存
+    s1Choices[s1i]=new Set(s1Selected);
 
-      scores.set(
-        id,
-        scores.get(id)+1
-      );
-
-    });
-
+    // 次の4人へ
     s1i++;
 
-    s1Selected=new Set();
-
-
-    if(s1i<s1Groups.length){
+    if(s1i < s1Groups.length){
 
       renderS1();
 
     }else{
 
+      // STEP1終了
       finishS1();
 
     }
 
   };
 
-}
 
+  // 前の4人へ
+  if(s1i > 0){
+
+    document.getElementById('back').onclick=()=>{
+
+      // 現在の選択を保存
+      s1Choices[s1i]=new Set(s1Selected);
+
+      // ひとつ前へ
+      s1i--;
+
+      renderS1();
+
+    };
+
+  }
+
+}
 
 /* =========================
    STEP1終了
 ========================= */
 
 function finishS1(){
+
+  scores=new Map(items.map(x=>[x.id,0]));
+
+s1Choices.forEach(choice=>{
+  choice.forEach(id=>{
+    scores.set(id,scores.get(id)+1);
+  });
+});
 
   const selectedCount=
     items.filter(
