@@ -49,7 +49,7 @@
 }</style></head>
 <body><div class="container"><h1>TOP9決定戦</h1><p class="subtitle">あなたの好きな9人を決定！</p><div class="progress"><div id="progressBar" class="progress-bar"></div></div><div id="app"></div></div>
 <script>
-const items=Array.from({length:100},(_,i)=>({id:i+1,name:`候補 ${i+1}`,image:`images/${String(i+1).padStart(3,'0')}.jpg`}));
+const items=Array.from({length:71},(_,i)=>({id:i+1,name:`候補 ${i+1}`,image:`images/${String(i+1).padStart(3,'0')}.jpg`}));
 const app=document.getElementById('app'),bar=document.getElementById('progressBar');
 let s1Groups=[],s1i=0,s1Selected=new Set(),scores=new Map();let s2Groups=[],s2i=0,s2First=null,s2Results=[];let finalCandidates=[],finalMatches=[],finalI=0,finalWins=new Map();
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
