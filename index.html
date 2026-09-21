@@ -1,159 +1,28 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>TOP9決定戦</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#f6f6f8;color:#222;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP",sans-serif}
-.wrap{max-width:760px;margin:auto;padding:16px}
-.card{background:#fff;border-radius:22px;padding:20px;box-shadow:0 8px 30px #0001}
-h1{font-size:25px;margin:0 0 6px;text-align:center}.sub{text-align:center;color:#777;margin:0 0 18px}
-.progress{height:8px;background:#e9e9ed;border-radius:99px;overflow:hidden;margin:12px 0 20px}
-.bar{height:100%;background:#555;transition:.2s}
-.options{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
-.opt{border:2px solid #e5e5ea;background:#fff;border-radius:16px;padding:0;overflow:hidden;cursor:pointer;position:relative}
-.opt.selected{border-color:#111;box-shadow:0 0 0 2px #111}
-.opt img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:#eee}
-.opt .label{display:block;padding:10px 8px;font-weight:700;font-size:15px}
-.primary,.secondary{border:0;border-radius:12px;padding:12px 20px;font-weight:700;cursor:pointer}
-.primary{background:#222;color:#fff}.secondary{background:#eee}
-.actions{display:flex;justify-content:center;gap:10px;margin-top:18px}
-.rank{display:flex;align-items:center;gap:12px;background:#f7f7f9;border-radius:14px;padding:9px}
-.rank img{width:64px;height:64px;object-fit:cover;border-radius:10px}
-.num{width:28px;font-weight:900;text-align:center}.name{flex:1;font-weight:700}.wins{font-size:13px;color:#777}
-.hidden{display:none}.hint{text-align:center;color:#888;font-size:12px;margin-top:12px}
-@media(max-width:480px){.wrap{padding:10px}.card{padding:14px}.options{gap:8px}.opt .label{font-size:13px}}
-</style>
-</head>
-<body>
-<div class="wrap"><div class="card">
-<h1>🏆 TOP9決定戦</h1>
-<p class="sub">100個の候補から、あなたのTOP9を決めよう！</p>
-
-<section id="game">
-  <div id="stageTitle"></div>
-  <div class="progress"><div id="bar" class="bar"></div></div>
-  <div id="content"></div>
-</section>
-
-<section id="result" class="hidden">
-  <h2 style="text-align:center">🏆 TOP9</h2>
-  <div id="ranking"></div>
-  <div class="actions"><button class="secondary" onclick="location.reload()">もう一度遊ぶ</button></div>
-</section>
-</div></div>
-
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;background:#f7f7f7;color:#222}.container{max-width:760px;margin:auto;padding:20px 14px 40px}h1{text-align:center;margin:8px 0 6px;font-size:28px}.subtitle{text-align:center;color:#666;margin:0 0 18px}.progress{height:10px;background:#e8e8e8;border-radius:99px;overflow:hidden;margin-bottom:20px}.progress-bar{height:100%;width:0;background:#222;transition:.2s}.stage{text-align:center;font-weight:700;margin-bottom:8px}.instruction{text-align:center;color:#555;margin:0 0 18px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{background:#fff;border:2px solid #ddd;border-radius:14px;overflow:hidden;cursor:pointer;transition:.15s;position:relative}.card.selected{border-color:#111;box-shadow:0 0 0 2px #111 inset}.card img{display:block;width:100%;aspect-ratio:1;object-fit:cover;background:#eee}.card .name{padding:10px;text-align:center;font-weight:700}.actions{text-align:center;margin-top:20px}button{border:0;border-radius:12px;background:#111;color:#fff;padding:13px 25px;font-size:16px;font-weight:700;cursor:pointer}.notice{text-align:center;color:#777;margin-top:10px;font-size:13px}.results{background:#fff;border-radius:16px;padding:16px}.result-row{display:flex;align-items:center;gap:10px;border-bottom:1px solid #eee;padding:9px 0}.rank{width:34px;font-weight:800;text-align:center}.result-row img{width:58px;height:58px;object-fit:cover;border-radius:10px;background:#eee}.result-name{font-weight:700;flex:1}.wins{font-size:13px;color:#666}@media(min-width:600px){.grid{grid-template-columns:repeat(4,1fr)}}
+</style></head>
+<body><div class="container"><h1>TOP9決定戦</h1><p class="subtitle">あなたの好きな9人を決定！</p><div class="progress"><div id="progressBar" class="progress-bar"></div></div><div id="app"></div></div>
 <script>
-/*
-  写真は images/001.jpg ～ images/100.jpg に入れてください。
-  名前は候補名に変更してください。
-*/
-const items = Array.from({length:100},(_,i)=>({
-  id:i+1,
-  name:`候補 ${i+1}`,
-  image:`images/${String(i+1).padStart(3,'0')}.jpg`
-}));
-
-let shuffled=[], groups=[], g=0, selected=[];
-let stage1Score={}, stage2=[], finalCandidates=[], finalRank=[];
-
-function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
-function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function img(x){return `<img src="${x.image}" alt="${esc(x.name)}" loading="eager" onerror="this.style.background='#ddd'">`}
-
-function start(){
-  shuffled=shuffle(items);
-  groups=[];
-  for(let i=0;i<shuffled.length;i+=4) groups.push(shuffled.slice(i,i+4));
-  // 100個なので25グループ。毎回ページを開くたびに順番をシャッフル。
-  stage1Score={}; items.forEach(x=>stage1Score[x.id]=0);
-  g=0; showStage1();
-}
-
-function showStage1(){
-  if(g>=25){finishStage1();return}
-  selected=[];
-  const group=groups[g];
-  title(`STEP 1　${g+1} / 25`,`この4つから<strong>0〜4個</strong>選んでください`);
-  bar(g/25*100);
-  content(`<div class="options">${group.map((x,i)=>`
-    <button class="opt" data-i="${i}" onclick="toggle(this)">
-      ${img(x)}<span class="label">${esc(x.name)}</span>
-    </button>`).join('')}</div>
-    <div class="actions"><button class="primary" onclick="next1()">次へ</button></div>
-    <div class="hint">※0〜4個選択できます（何も選ばず「次へ」もOK）</div>`);
-}
-function toggle(b){
-  const i=+b.dataset.i;
-  if(b.classList.contains('selected')){
-    b.classList.remove('selected'); selected=selected.filter(x=>x!==i);
-  }else if(selected.length<4){b.classList.add('selected');selected.push(i)}
-}
-function next1(){
-  // 0個選択でもそのまま次へ進めます
-  selected.forEach(i=>stage1Score[groups[g][i].id]++);
-  g++;showStage1();
-}
-function finishStage1(){
-  const top=[...items].sort((a,b)=>stage1Score[b.id]-stage1Score[a.id]||Math.random()-.5).slice(0,36);
-  groups=[];for(let i=0;i<36;i+=4)groups.push(top.slice(i,i+4));
-  g=0;stage2=[];showStage2();
-}
-function showStage2(){
-  if(g>=9){finishStage2();return}
-  const group=groups[g];
-  title(`STEP 2　${g+1} / 9`,`4つの中から<strong>1位</strong>を選んでください`);
-  bar(g/9*100);
-  content(`<div class="options">${group.map((x,i)=>`
-    <button class="opt" onclick="pickFirst(${i})">${img(x)}<span class="label">${esc(x.name)}</span></button>`).join('')}</div>`);
-}
-function pickFirst(i){
-  const group=groups[g], first=group[i];
-  const rest=group.filter((_,j)=>j!==i);
-  title(`STEP 2　${g+1} / 9`,`続いて<strong>2位</strong>を選んでください`);
-  content(`<div class="options">${rest.map(x=>`
-    <button class="opt" onclick="pickSecond(${x.id})">${img(x)}<span class="label">${esc(x.name)}</span></button>`).join('')}</div>`);
-  window._first=first;
-}
-function pickSecond(id){
-  stage2.push(window._first,groups[g].find(x=>x.id===id));
-  g++;showStage2();
-}
-function finishStage2(){
-  // 18候補から、好きな順に9個だけ選びます。
-  // 153回の一対一比較は行いません。
-  finalCandidates=[...stage2];
-  finalRank=[];
-  pickFinal();
-}
-function pickFinal(){
-  if(finalRank.length>=9){finish();return}
-  const n=finalRank.length+1;
-  title(`STEP 3　${n} / 9`,`18候補の中から、あなたの<strong>${n}位</strong>を選んでください`);
-  bar(finalRank.length/9*100);
-  content(`<div class="options">${finalCandidates.map(x=>`
-    <button class="opt" onclick="pickFinalOne(${x.id})">${img(x)}<span class="label">${esc(x.name)}</span></button>`).join('')}</div>
-    <div class="hint">※選んだ候補は次の順位では表示されません</div>`);
-}
-function pickFinalOne(id){
-  const x=finalCandidates.find(x=>x.id===id);
-  if(!x)return;
-  finalRank.push(x);
-  finalCandidates=finalCandidates.filter(x=>x.id!==id);
-  pickFinal();
-}
-function finish(){
-  document.getElementById('game').classList.add('hidden');
-  document.getElementById('result').classList.remove('hidden');
-  document.getElementById('ranking').innerHTML=finalRank.map((x,i)=>`
-    <div class="rank"><div class="num">${i+1}</div>${img(x)}<div class="name">${esc(x.name)}</div></div>`).join('');
-}
-function title(a,b){document.getElementById('stageTitle').innerHTML=`<h2>${a}</h2><p class="sub">${b}</p>`}
-function bar(v){document.getElementById('bar').style.width=v+'%'}
-function content(v){document.getElementById('content').innerHTML=v}
+const items=Array.from({length:100},(_,i)=>({id:i+1,name:`候補 ${i+1}`,image:`images/${String(i+1).padStart(3,'0')}.jpg`}));
+const app=document.getElementById('app'),bar=document.getElementById('progressBar');
+let s1Groups=[],s1i=0,s1Selected=new Set(),scores=new Map();let s2Groups=[],s2i=0,s2First=null,s2Results=[];let finalCandidates=[],finalMatches=[],finalI=0,finalWins=new Map();
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function imgError(img){img.onerror=null;img.src='data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><rect width="400" height="400" fill="#eee"/><text x="200" y="200" text-anchor="middle" dominant-baseline="middle" font-size="24" fill="#888">画像なし</text></svg>')}
+function card(x,sel=false){return `<div class="card ${sel?'selected':''}" data-id="${x.id}"><img src="${x.image}" onerror="imgError(this)"><div class="name">${x.name}</div></div>`}
+function progress(n,total){bar.style.width=Math.min(100,n/total*100)+'%'}
+function start(){let a=shuffle(items);s1Groups=[];for(let i=0;i<100;i+=4)s1Groups.push(a.slice(i,i+4));s1i=0;s1Selected=new Set();scores=new Map(items.map(x=>[x.id,0]));renderS1()}
+function renderS1(){let g=s1Groups[s1i];progress(s1i,25);app.innerHTML=`<div class="stage">STEP 1 / 3</div><p class="instruction">4人の中から、好きな人を <b>0〜4人</b> 選んでください</p><div class="grid">${g.map(x=>card(x,s1Selected.has(x.id))).join('')}</div><div class="actions"><button id="next">次へ</button></div><div class="notice">0人を選ぶ場合は、そのまま「次へ」</div>`;document.querySelectorAll('.card').forEach(el=>el.onclick=()=>{let id=+el.dataset.id;if(s1Selected.has(id)){s1Selected.delete(id);el.classList.remove('selected')}else{s1Selected.add(id);el.classList.add('selected')}});document.getElementById('next').onclick=()=>{s1Selected.forEach(id=>scores.set(id,scores.get(id)+1));s1i++;s1Selected=new Set();s1i<25?renderS1():finishS1()}}
+function finishS1(){let ranked=shuffle(items).sort((a,b)=>scores.get(b.id)-scores.get(a.id));let top36=ranked.slice(0,36);s2Groups=[];for(let i=0;i<36;i+=4)s2Groups.push(top36.slice(i,i+4));s2i=0;s2First=null;s2Results=[];renderS2First()}
+function renderS2First(){let g=s2Groups[s2i];progress(25+s2i/9*25,50);app.innerHTML=`<div class="stage">STEP 2 / 3</div><p class="instruction">この4人の中から <b>1位</b> を選んでください</p><div class="grid">${g.map(x=>card(x)).join('')}</div>`;document.querySelectorAll('.card').forEach(el=>el.onclick=()=>{s2First=g.find(x=>x.id==el.dataset.id);renderS2Second()})}
+function renderS2Second(){let rem=s2Groups[s2i].filter(x=>x.id!==s2First.id);app.innerHTML=`<div class="stage">STEP 2 / 3</div><p class="instruction">残り3人から <b>2位</b> を選んでください</p><div class="grid">${rem.map(x=>card(x)).join('')}</div>`;document.querySelectorAll('.card').forEach(el=>el.onclick=()=>{s2Results.push(s2First,rem.find(x=>x.id==el.dataset.id));s2i++;s2First=null;s2i<9?renderS2First():startFinal()})}
+function makeMatches(cands,rounds=4){let target=cands.length*rounds/2,matches=[],used=new Set(),tries=0;while(matches.length<target&&tries++<2000){let a=shuffle(cands),pairs=[],ok=true;for(let i=0;i<a.length;i+=2){let x=a[i],y=a[i+1],key=[Math.min(x.id,y.id),Math.max(x.id,y.id)].join('-');if(used.has(key)){ok=false;break}pairs.push({a:x,b:y,key})}if(ok)pairs.forEach(p=>{used.add(p.key);matches.push({a:p.a,b:p.b})})}while(matches.length<target){let a=shuffle(cands);for(let i=0;i<a.length&&matches.length<target;i+=2)matches.push({a:a[i],b:a[i+1]})}return shuffle(matches)}
+function startFinal(){finalCandidates=s2Results;finalWins=new Map(finalCandidates.map(x=>[x.id,0]));finalMatches=makeMatches(finalCandidates,4);finalI=0;renderFinal()}
+function renderFinal(){if(finalI>=finalMatches.length)return finishFinal();let m=finalMatches[finalI];progress(50+finalI/finalMatches.length*50,100);app.innerHTML=`<div class="stage">STEP 3 / 3</div><p class="instruction">どちらが好き？ <b>${finalI+1} / ${finalMatches.length}</b></p><div class="grid">${card(m.a)}${card(m.b)}</div><div class="notice">18候補がそれぞれ4回ずつ対戦します</div>`;document.querySelectorAll('.card').forEach(el=>el.onclick=()=>{let id=+el.dataset.id;finalWins.set(id,finalWins.get(id)+1);finalI++;renderFinal()})}
+function finishFinal(){let result=shuffle(finalCandidates).sort((a,b)=>finalWins.get(b.id)-finalWins.get(a.id));progress(100,100);app.innerHTML=`<div class="stage">🎉 あなたのTOP9 🎉</div><p class="instruction">最終STEPの勝利数をもとに決定しました</p><div class="results">${result.slice(0,9).map((x,i)=>`<div class="result-row"><div class="rank">${i+1}位</div><img src="${x.image}" onerror="imgError(this)"><div class="result-name">${x.name}</div><div class="wins">${finalWins.get(x.id)}勝</div></div>`).join('')}</div><div class="actions"><button onclick="location.reload()">もう一度やる</button></div>`}
 start();
-</script>
-</body>
-</html>
+</script></body></html>
