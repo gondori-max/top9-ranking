@@ -806,9 +806,28 @@ function finishS1(){
       };
 
     return;
-  }
+   /*
+    STEP2で使う人を保存
+  */
+  s2Results=
+    shuffle(selected);
 
   /*
+    STEP2の得点をリセット
+  */
+  s2Scores=
+    new Map(
+      selected.map(
+        x=>[x.id,0]
+      )
+    );
+
+  /*
+    STEP2を1回目から開始
+  */
+  s2Round=0;
+
+  startS2Round(); /*
     選ばれた人だけをシャッフル
   */
   const selectedPlayers=
