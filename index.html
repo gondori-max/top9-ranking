@@ -768,7 +768,7 @@ function finishS1(){
   const selectedCount=
     selected.length;
 
-  /*
+   /*
     18人未満ならやり直し
   */
   if(
@@ -802,7 +802,9 @@ function finishS1(){
       };
 
     return;
-   /*
+  }
+
+  /*
     STEP2で使う人を保存
   */
   s2Results=
@@ -823,7 +825,8 @@ function finishS1(){
   */
   s2Round=0;
 
-  startS2Round(); /*
+  startS2Round();
+}
     選ばれた人だけをシャッフル
   */
   const selectedPlayers=
