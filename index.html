@@ -1193,8 +1193,9 @@ function finishS2(){
 }
 /* ==================================================
    STEP3
-   18人 → TOP9
+   9人全員総当たり
 ================================================== */
+
 function makeMatches(cands){
 
   const matches=[];
@@ -1215,43 +1216,6 @@ function makeMatches(cands){
   return shuffle(matches);
 }
 
-
-    for(let i=0; i<n; i++){
-
-      const j=
-        (i+offset)%n;
-
-      const x=cands[i];
-      const y=cands[j];
-
-      const key=[
-        Math.min(x.id,y.id),
-        Math.max(x.id,y.id)
-      ].join('-');
-
-      /*
-        同じ組み合わせは1回だけ
-      */
-      if(!used.has(key)){
-
-        used.add(key);
-
-        matches.push({
-          a:x,
-          b:y
-        });
-
-      }
-
-    }
-
-  }
-
-  /*
-    対戦順をランダムにする
-  */
-  return shuffle(matches);
-}
 /* ==================================================
    STEP3画面
 ================================================== */
