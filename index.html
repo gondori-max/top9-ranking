@@ -827,32 +827,6 @@ function finishS1(){
 
   startS2Round();
 }
-    選ばれた人だけをシャッフル
-  */
-  const selectedPlayers=
-    shuffle(selected);
-
-  /*
-    4人ずつグループ化
-  */
-  s2Groups=[];
-
-  for(
-    let i=0;
-    i<selectedPlayers.length;
-    i+=4
-  ){
-    s2Groups.push(
-      selectedPlayers.slice(i,i+4)
-    );
-  }
-
-  s2i=0;
-  s2First=null;
-  s2Results=[];
-
-  renderS2First();
-}
 /* ==================================================
    STEP2
    3回戦
