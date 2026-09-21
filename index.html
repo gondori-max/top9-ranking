@@ -138,9 +138,11 @@ function start(){
 
   s1Selected=new Set();
 
-  scores=new Map(items.map(x=>[x.id,0]));
+    scores=new Map(items.map(x=>[x.id,0]));
 
- function renderS1(){
+}
+
+function renderS1(){
 
   // このグループですでに選んでいた人を復元
   s1Selected=new Set(s1Choices[s1i]);
