@@ -213,6 +213,30 @@ button.back-button{
 /* =========================
    候補者
 ========================= */
+function getImageExtension(n){
+
+  // .jpg
+  if(
+    (n>=2815 && n<=2820) ||
+    (n>=2832 && n<=2837) ||
+    (n>=2900 && n<=2903)
+  ){
+    return '.jpg';
+  }
+
+  // .WEBP
+  if(
+    (n>=2821 && n<=2825 && n!==2824) ||
+    (n>=2877 && n<=2881)
+  ){
+    return '.WEBP';
+  }
+
+  // その他は .JPG
+  return '.JPG';
+}
+
+
 const imageNumbers=[];
 
 for(let n=2815;n<=2903;n++){
@@ -222,15 +246,16 @@ for(let n=2815;n<=2903;n++){
   }
 
   imageNumbers.push(n);
-
 }
+
 
 const items=Array.from(
   {length:85},
   (_,i)=>({
     id:i+1,
     name:`候補 ${i+1}`,
-    image:`images/IMAGE_${imageNumbers[i]}.jpg`
+    image:
+      `images/IMAGE_${imageNumbers[i]}${getImageExtension(imageNumbers[i])}`
   })
 );
 /* =========================
