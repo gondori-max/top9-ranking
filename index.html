@@ -724,9 +724,14 @@ function renderS1(){
    STEP1終了
    71人 → 36人
 ================================================== */
+/* ==================================================
+   STEP1終了
+   選ばれた人だけをSTEP2へ
+================================================== */
 function finishS1(){
+
   /*
-    一度スコアをリセット
+    スコアをリセット
   */
   scores=
     new Map(
@@ -734,8 +739,9 @@ function finishS1(){
         x=>[x.id,0]
       )
     );
+
   /*
-    最終的な選択内容から
+    STEP1の選択結果から
     スコアを計算
   */
   s1Choices.forEach(
@@ -750,17 +756,22 @@ function finishS1(){
       );
     }
   );
+
   /*
-    何人が1回以上選ばれたか
+    1回以上選ばれた人だけ
   */
-  const selectedCount=
+  const selected=
     items.filter(
       x=>
         scores.get(x.id)>0
-    ).length;
-  /* =========================
-     18人未満
-  ========================= */
+    );
+
+  const selectedCount=
+    selected.length;
+
+  /*
+    18人未満ならやり直し
+  */
   if(
     selectedCount<18
   ){
@@ -768,6 +779,7 @@ function finishS1(){
       <div class="stage">
         もう一度チャレンジ！
       </div>
+
       <p class="instruction">
         STEP1で選ばれた人数が
         <b>${selectedCount}人</b>
@@ -776,72 +788,102 @@ function finishS1(){
         18人以上
         選ばれる必要があります。
       </p>
+
       <div class="actions">
         <button id="restart">
           最初からやり直す
         </button>
       </div>
     `;
+
     document
       .getElementById('restart')
       .onclick=()=>{
         start();
       };
+
     return;
   }
-  /* =========================
-     スコア順に並べる
-  ========================= */
-  const ranked=
-    shuffle(items).sort(
-      (a,b)=>
-        scores.get(b.id)-
-        scores.get(a.id)
-    );
+
   /*
-    上位36人
+    選ばれた人だけをシャッフル
   */
-  const top36=
-    ranked.slice(0,36);
-  /* =========================
-     4人ずつ9グループ
-  ========================= */
+  const selectedPlayers=
+    shuffle(selected);
+
+  /*
+    4人ずつグループ化
+  */
   s2Groups=[];
+
   for(
     let i=0;
-    i<36;
+    i<selectedPlayers.length;
     i+=4
   ){
     s2Groups.push(
-      top36.slice(i,i+4)
+      selectedPlayers.slice(i,i+4)
     );
   }
+
   s2i=0;
   s2First=null;
   s2Results=[];
+
   renderS2First();
 }
 /* ==================================================
    STEP2
-   36人 → 18人
+   選ばれた人数 → 約半分
 ================================================== */
 function renderS2First(){
+
   const g=
     s2Groups[s2i];
+
+  /*
+    1人だけのグループの場合
+    その人をそのまま通過
+  */
+  if(g.length===1){
+
+    s2Results.push(
+      g[0]
+    );
+
+    s2i++;
+
+    if(
+      s2i<
+      s2Groups.length
+    ){
+      renderS2First();
+    }else{
+      startFinal();
+    }
+
+    return;
+  }
+
   progress(
     25+
-    s2i/9*25,
+    s2i/
+    s2Groups.length*
+    25,
     50
   );
+
   app.innerHTML=`
     <div class="stage">
       STEP 2 / 3
     </div>
+
     <p class="instruction">
-      この4人の中から
+      この${g.length}人の中から
       <b>1位</b>
       を選んでください
     </p>
+
     <div class="grid">
       ${
         g.map(
@@ -849,42 +891,47 @@ function renderS2First(){
         ).join('')
       }
     </div>
+
     <div class="actions">
       <button id="back">
         STEP1に戻る
       </button>
     </div>
   `;
+
   /*
     1位選択
   */
   document
     .querySelectorAll('.card')
     .forEach(el=>{
+
       el.onclick=()=>{
+
         s2First=
           g.find(
             x=>
               x.id==
-              el.dataset.id
+              +el.dataset.id
           );
+
         renderS2Second();
       };
+
     });
+
   /*
     STEP1へ戻る
   */
   document
     .getElementById('back')
     .onclick=()=>{
-      /*
-        現在のSTEP1の選択を
-        保持したまま戻る
-        STEP1の最後のグループを表示
-      */
+
       s1i=
         s1Groups.length-1;
+
       renderS1();
+
     };
 }
 /* ==================================================
@@ -892,20 +939,27 @@ function renderS2First(){
    2位選択
 ================================================== */
 function renderS2Second(){
+
   const rem=
     s2Groups[s2i].filter(
       x=>
         x.id!==s2First.id
     );
+
+  /*
+    残りが1人以上いる場合
+  */
   app.innerHTML=`
     <div class="stage">
       STEP 2 / 3
     </div>
+
     <p class="instruction">
-      残り3人から
+      残り${rem.length}人から
       <b>2位</b>
       を選んでください
     </p>
+
     <div class="grid">
       ${
         rem.map(
@@ -913,45 +967,63 @@ function renderS2Second(){
         ).join('')
       }
     </div>
+
     <div class="actions">
       <button id="back">
         1位選択に戻る
       </button>
     </div>
   `;
+
   /*
     2位選択
   */
   document
     .querySelectorAll('.card')
     .forEach(el=>{
+
       el.onclick=()=>{
-        s2Results.push(
-          s2First,
+
+        const second=
           rem.find(
             x=>
               x.id==
-              el.dataset.id
-          )
+              +el.dataset.id
+          );
+
+        /*
+          1位・2位を通過
+        */
+        s2Results.push(
+          s2First,
+          second
         );
+
         s2i++;
         s2First=null;
+
         if(
-          s2i<9
+          s2i<
+          s2Groups.length
         ){
           renderS2First();
         }else{
           startFinal();
         }
+
       };
+
     });
+
   /*
     1位選択へ戻る
   */
   document
     .getElementById('back')
     .onclick=()=>{
+
       renderS2First();
+
     };
 }
 /* ==================================================
