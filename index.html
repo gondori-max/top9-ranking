@@ -213,27 +213,58 @@ button.back-button{
 /* =========================
    候補者
 ========================= */
-function getImageExtension(n){
 
-  // .jpg
-  if(
-    (n>=2815 && n<=2820) ||
-    (n>=2832 && n<=2837) ||
-    (n>=2900 && n<=2903)
-  ){
-    return '.jpg';
+function getImageInfo(n){
+
+  // 2815〜2820
+  if(n>=2815 && n<=2820){
+    return {
+      prefix:'IMAGE_',
+      ext:'.jpg'
+    };
   }
 
-  // .WEBP
+  // 2821〜2825（2824を除く）
   if(
-    (n>=2821 && n<=2825 && n!==2824) ||
-    (n>=2877 && n<=2881)
+    n>=2821 &&
+    n<=2825 &&
+    n!==2824
   ){
-    return '.WEBP';
+    return {
+      prefix:'IMG_',
+      ext:'.WEBP'
+    };
   }
 
-  // その他は .JPG
-  return '.JPG';
+  // 2877〜2881
+  if(n>=2877 && n<=2881){
+    return {
+      prefix:'IMG_',
+      ext:'.WEBP'
+    };
+  }
+
+  // 2832〜2837
+  if(n>=2832 && n<=2837){
+    return {
+      prefix:'IMG_',
+      ext:'.jpg'
+    };
+  }
+
+  // 2900〜2903
+  if(n>=2900 && n<=2903){
+    return {
+      prefix:'IMG_',
+      ext:'.jpg'
+    };
+  }
+
+  // その他
+  return {
+    prefix:'IMG_',
+    ext:'.JPG'
+  };
 }
 
 
@@ -251,12 +282,19 @@ for(let n=2815;n<=2903;n++){
 
 const items=Array.from(
   {length:85},
-  (_,i)=>({
-    id:i+1,
-    name:`候補 ${i+1}`,
-    image:
-      `images/IMAGE_${imageNumbers[i]}${getImageExtension(imageNumbers[i])}`
-  })
+  (_,i)=>{
+
+    const n=imageNumbers[i];
+    const info=getImageInfo(n);
+
+    return {
+      id:i+1,
+      name:`候補 ${i+1}`,
+      image:
+        `images/${info.prefix}${n}${info.ext}`
+    };
+
+  }
 );
 /* =========================
    DOM
