@@ -1215,17 +1215,6 @@ function makeMatches(cands){
   return shuffle(matches);
 }
 
-  const matches=[];
-  const used=new Set();
-
-  /*
-    人数に関係なく、
-    1人につき4人の相手と対戦する
-  */
-
-  const n=cands.length;
-
-  for(let offset=1; offset<=rounds/2; offset++){
 
     for(let i=0; i<n; i++){
 
