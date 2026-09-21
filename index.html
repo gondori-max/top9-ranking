@@ -1,787 +1,1013 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>TOP9決定戦</title>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;background:#f7f7f7;color:#222}.container{max-width:760px;margin:auto;padding:20px 14px 40px}h1{text-align:center;margin:8px 0 6px;font-size:28px}.subtitle{text-align:center;color:#666;margin:0 0 18px}.progress{height:10px;background:#e8e8e8;border-radius:99px;overflow:hidden;margin-bottom:20px}.progress-bar{height:100%;width:0;background:#222;transition:.2s}.stage{text-align:center;font-weight:700;margin-bottom:8px}.instruction{text-align:center;color:#555;margin:0 0 18px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.card{background:#fff;border:2px solid #ddd;border-radius:14px;overflow:hidden;cursor:pointer;transition:.15s;position:relative}.card.selected{border-color:#111;box-shadow:0 0 0 2px #111 inset}.card img{display:block;width:100%;aspect-ratio:1;object-fit:cover;background:#eee}.card .name{padding:10px;text-align:center;font-weight:700}.actions{text-align:center;margin-top:20px}button{border:0;border-radius:12px;background:#111;color:#fff;padding:13px 25px;font-size:16px;font-weight:700;cursor:pointer}.notice{text-align:center;color:#777;margin-top:10px;font-size:13px}.results{background:#fff;border-radius:16px;padding:16px}.result-row{display:flex;align-items:center;gap:10px;border-bottom:1px solid #eee;padding:9px 0}.rank{width:34px;font-weight:800;text-align:center}.result-row img{width:58px;height:58px;object-fit:cover;border-radius:10px;background:#eee}.result-name{font-weight:700;flex:1}.wins{font-size:13px;color:#666}@media(min-width:600px){.grid{grid-template-columns:repeat(4,1fr)}}
+*{
+  box-sizing:border-box;
+}
+body{
+  margin:0;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "Hiragino Kaku Gothic ProN",
+    "Yu Gothic",
+    sans-serif;
+  background:#f7f7f7;
+  color:#222;
+}
+.container{
+  max-width:760px;
+  margin:auto;
+  padding:20px 14px 40px;
+}
+h1{
+  text-align:center;
+  margin:8px 0 6px;
+  font-size:28px;
+}
+.subtitle{
+  text-align:center;
+  color:#666;
+  margin:0 0 18px;
+}
+.progress{
+  height:10px;
+  background:#e8e8e8;
+  border-radius:99px;
+  overflow:hidden;
+  margin-bottom:20px;
+}
+.progress-bar{
+  height:100%;
+  width:0;
+  background:#222;
+  transition:.2s;
+}
+.stage{
+  text-align:center;
+  font-weight:700;
+  margin-bottom:8px;
+}
+.instruction{
+  text-align:center;
+  color:#555;
+  margin:0 0 18px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+.card{
+  background:#fff;
+  border:2px solid #ddd;
+  border-radius:14px;
+  overflow:hidden;
+  cursor:pointer;
+  transition:.15s;
+  position:relative;
+}
+.card.selected{
+  border-color:#111;
+  box-shadow:0 0 0 2px #111 inset;
+}
+.card img{
+  display:block;
+  width:100%;
+  aspect-ratio:1;
+  object-fit:cover;
+  background:#eee;
+}
+.card .name{
+  padding:10px;
+  text-align:center;
+  font-weight:700;
+}
+.actions{
+  text-align:center;
+  margin-top:20px;
+}
+button{
+  border:0;
+  border-radius:12px;
+  background:#111;
+  color:#fff;
+  padding:13px 25px;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+}
+button.back-button{
+  background:#777;
+  margin-right:10px;
+}
+.notice{
+  text-align:center;
+  color:#777;
+  margin-top:10px;
+  font-size:13px;
+}
+.results{
+  background:#fff;
+  border-radius:16px;
+  padding:16px;
+}
+.result-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border-bottom:1px solid #eee;
+  padding:9px 0;
+}
+.rank{
+  width:34px;
+  font-weight:800;
+  text-align:center;
+}
+.result-row img{
+  width:58px;
+  height:58px;
+  object-fit:cover;
+  border-radius:10px;
+  background:#eee;
+}
+.result-name{
+  font-weight:700;
+  flex:1;
+}
+.wins{
+  font-size:13px;
+  color:#666;
+}
+/* =========================
+   TOP9 写真
+========================= */
 .top9-photo-grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:8px;
   margin:20px 0 24px;
 }
-
 .top9-photo{
   aspect-ratio:1/1;
   border-radius:10px;
   overflow:hidden;
   background:#eee;
 }
-
 .top9-photo img{
   width:100%;
   height:100%;
   object-fit:cover;
   display:block;
 }
-
+/* =========================
+   ランキング
+========================= */
 .ranking-list{
   background:#fff;
   border-radius:14px;
   padding:10px 16px;
 }
-
 .ranking-item{
   display:flex;
   gap:20px;
   padding:10px 0;
   border-bottom:1px solid #eee;
 }
-
 .ranking-item:last-child{
   border-bottom:none;
 }
-
 .ranking-item span:first-child{
   width:45px;
   font-weight:700;
-}</style></head>
-<body><div class="container"><h1>TOP9決定戦</h1><p class="subtitle">あなたの好きな9人を決定！</p><div class="progress"><div id="progressBar" class="progress-bar"></div></div><div id="app"></div></div>
+}
+/* =========================
+   PC
+========================= */
+@media(min-width:600px){
+  .grid{
+    grid-template-columns:repeat(4,1fr);
+  }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>TOP9決定戦</h1>
+  <p class="subtitle">
+    あなたの好きな9人を決定！
+  </p>
+  <div class="progress">
+    <div
+      id="progressBar"
+      class="progress-bar"
+    ></div>
+  </div>
+  <div id="app"></div>
+</div>
 <script>
-const items=Array.from({length:71},(_,i)=>({
-  id:i+1,
-  name:`候補 ${i+1}`,
-  image:`images/${String(i+1).padStart(3,'0')}.jpg`
-}));
-
+/* =========================
+   候補者
+========================= */
+const items=Array.from(
+  {length:71},
+  (_,i)=>({
+    id:i+1,
+    name:`候補 ${i+1}`,
+    image:`images/${String(i+1).padStart(3,'0')}.jpg`
+  })
+);
+/* =========================
+   DOM
+========================= */
 const app=document.getElementById('app');
 const bar=document.getElementById('progressBar');
-
-let s1Groups=[],
-    s1i=0,
-    s1Selected=new Set(),
-    s1Choices=[],
-    scores=new Map();
-
+/* =========================
+   STEP1
+========================= */
+let s1Groups=[];
+let s1i=0;
+let s1Selected=new Set();
+/*
+  各4人グループで
+  どの人を選んだか保存する
+*/
+let s1Choices=[];
+let scores=new Map();
+/* =========================
+   STEP2
+========================= */
 let s2Groups=[];
 let s2i=0;
 let s2First=null;
 let s2Results=[];
-
+/* =========================
+   STEP3
+========================= */
 let finalCandidates=[];
 let finalMatches=[];
 let finalI=0;
 let finalWins=new Map();
-
-
+/* =========================
+   シャッフル
+========================= */
 function shuffle(a){
   a=[...a];
-
-  for(let i=a.length-1;i>0;i--){
-    let j=Math.floor(Math.random()*(i+1));
-    [a[i],a[j]]=[a[j],a[i]];
+  for(
+    let i=a.length-1;
+    i>0;
+    i--
+  ){
+    let j=
+      Math.floor(
+        Math.random()*(i+1)
+      );
+    [
+      a[i],
+      a[j]
+    ]=[
+      a[j],
+      a[i]
+    ];
   }
-
   return a;
 }
-
-
+/* =========================
+   画像エラー
+========================= */
 function imgError(img){
   img.onerror=null;
-
-  img.src='data:image/svg+xml;charset=UTF-8,'+
-  encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">'+
-    '<rect width="400" height="400" fill="#eee"/>'+
-    '<text x="200" y="200" text-anchor="middle" '+
-    'dominant-baseline="middle" font-size="24" fill="#888">'+
-    '画像なし</text></svg>'
-  );
+  img.src=
+    'data:image/svg+xml;charset=UTF-8,'+
+    encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" '+
+      'viewBox="0 0 400 400">'+
+      '<rect '+
+      'width="400" '+
+      'height="400" '+
+      'fill="#eee"/>'+
+      '<text '+
+      'x="200" '+
+      'y="200" '+
+      'text-anchor="middle" '+
+      'dominant-baseline="middle" '+
+      'font-size="24" '+
+      'fill="#888">'+
+      '画像なし'+
+      '</text>'+
+      '</svg>'
+    );
 }
-
-
-function card(x,sel=false){
+/* =========================
+   カード
+========================= */
+function card(x,selected=false){
   return `
-    <div class="card ${sel?'selected':''}" data-id="${x.id}">
-      <img src="${x.image}" onerror="imgError(this)">
-      <div class="name">${x.name}</div>
+    <div
+      class="card ${selected?'selected':''}"
+      data-id="${x.id}"
+    >
+      <img
+        src="${x.image}"
+        onerror="imgError(this)"
+      >
+      <div class="name">
+        ${x.name}
+      </div>
     </div>
   `;
 }
-
-
-function progress(n,total){
-  bar.style.width=Math.min(100,n/total*100)+'%';
-}
-
-
-100)+'%';
-}
 /* =========================
-   STEP1
-   71人 → 36人
+   プログレスバー
 ========================= */
-
-function start(){
-
-  let a=shuffle(items);
-
-  s1Groups=[];
-
-  for(let i=0;i<a.length;i+=4){
-    s1Groups.push(a.slice(i,i+4));
-  }
-
-  s1i=0;
-
-  // 各4人グループで選んだ内容を保存
-  s1Choices=s1Groups.map(()=>new Set());
-
-  s1Selected=new Set();
-
-  scores=new Map(items.map(x=>[x.id,0]));
+function progress(n,total){
+  bar.style.width=
+    Math.min(
+      100,
+      n/total*100
+    )+'%';
 }
-
-
+/* ==================================================
+   STEP1開始
+   71人を4人ずつに分ける
+================================================== */
+function start(){
+  const a=shuffle(items);
+  s1Groups=[];
+  for(
+    let i=0;
+    i<a.length;
+    i+=4
+  ){
+    s1Groups.push(
+      a.slice(i,i+4)
+    );
+  }
+  /*
+    71人なので
+    4人 × 17グループ
+    ＋最後3人
+    =18グループ
+  */
+  s1i=0;
+  /*
+    各グループの選択内容を保存
+  */
+  s1Choices=
+    s1Groups.map(
+      ()=>new Set()
+    );
+  s1Selected=
+    new Set();
+  scores=
+    new Map(
+      items.map(
+        x=>[x.id,0]
+      )
+    );
+  renderS1();
+}
+/* ==================================================
+   STEP1画面
+================================================== */
 function renderS1(){
-
-  // この4人組ですでに選んでいた人を復元
-  s1Selected=new Set(s1Choices[s1i]);
-
-  const g=s1Groups[s1i];
-
-  progress(s1i,s1Groups.length);
-
+  /*
+    前のグループから戻ってきた場合、
+    そのときの選択を復元
+  */
+  s1Selected=
+    new Set(
+      s1Choices[s1i]
+    );
+  const g=
+    s1Groups[s1i];
+  progress(
+    s1i,
+    s1Groups.length
+  );
   app.innerHTML=`
-    <div class="stage">STEP 1 / 3</div>
-
-    <p class="instruction">
-      4人の中から、好きな人を <b>0〜4人</b> 選んでください
-    </p>
-
-    <div class="grid">
-      ${g.map(x=>card(x,s1Selected.has(x.id))).join('')}
+    <div class="stage">
+      STEP 1 / 3
     </div>
-
+    <p class="instruction">
+      4人の中から、
+      好きな人を
+      <b>0〜4人</b>
+      選んでください
+    </p>
+    <div class="grid">
+      ${
+        g.map(
+          x=>
+            card(
+              x,
+              s1Selected.has(x.id)
+            )
+        ).join('')
+      }
+    </div>
     <div class="actions">
-
       ${
         s1i>0
-        ? `
-          <button id="back" style="margin-right:10px;background:#777;">
+        ?
+        `
+          <button
+            id="back"
+            class="back-button"
+          >
             ← 前の4人に戻る
           </button>
         `
-        : ''
+        :
+        ''
       }
-
-      <button id="next">次へ</button>
-
+      <button id="next">
+        次へ
+      </button>
     </div>
-
     <div class="notice">
-      0人を選ぶ場合は、そのまま「次へ」
+      0人を選ぶ場合は、
+      そのまま「次へ」
     </div>
   `;
-
-
-  // カード選択
-  document.querySelectorAll('.card').forEach(el=>{
-
-    el.onclick=()=>{
-
-      const id=+el.dataset.id;
-
-      if(s1Selected.has(id)){
-
-        s1Selected.delete(id);
-        el.classList.remove('selected');
-
-      }else{
-
-        s1Selected.add(id);
-        el.classList.add('selected');
-
-      }
-
-      // 現在の4人組の選択内容を保存
-      s1Choices[s1i]=new Set(s1Selected);
-
-    };
-
-  });
-
-
-  // 次へ
-  document.getElementById('next').onclick=()=>{
-
-    // 現在の選択を保存
-    s1Choices[s1i]=new Set(s1Selected);
-
-    s1i++;
-
-    if(s1i<s1Groups.length){
-
-      renderS1();
-
-    }else{
-
-      finishS1();
-
-    }
-
-  };
-
-
-  // 前の4人へ
-  if(s1i>0){
-
-    document.getElementById('back').onclick=()=>{
-
-      // 現在の選択を保存
-      s1Choices[s1i]=new Set(s1Selected);
-
-      s1i--;
-
-      renderS1();
-
-    };
-
-  }
-
-}
-
-
-/* =========================
-   STEP1終了
-========================= */
-
-function finishS1(){
-
-  // 保存されている選択内容から点数を再計算
-  scores=new Map(items.map(x=>[x.id,0]));
-
-  s1Choices.forEach(choice=>{
-
-    choice.forEach(id=>{
-
-      scores.set(
-        id,
-        scores.get(id)+1
-      );
-
+  /* =========================
+     カード選択
+  ========================= */
+  document
+    .querySelectorAll('.card')
+    .forEach(el=>{
+      el.onclick=()=>{
+        const id=
+          +el.dataset.id;
+        if(
+          s1Selected.has(id)
+        ){
+          /*
+            選択解除
+          */
+          s1Selected.delete(id);
+          el.classList.remove(
+            'selected'
+          );
+        }else{
+          /*
+            選択
+          */
+          s1Selected.add(id);
+          el.classList.add(
+            'selected'
+          );
+        }
+        /*
+          現在の4人組の選択を保存
+        */
+        s1Choices[s1i]=
+          new Set(
+            s1Selected
+          );
+      };
     });
-
-  });
-
-
+  /* =========================
+     次へ
+  ========================= */
+  document
+    .getElementById('next')
+    .onclick=()=>{
+      /*
+        現在の選択を保存
+      */
+      s1Choices[s1i]=
+        new Set(
+          s1Selected
+        );
+      s1i++;
+      if(
+        s1i<
+        s1Groups.length
+      ){
+        /*
+          次の4人
+        */
+        renderS1();
+      }else{
+        /*
+          STEP1終了
+        */
+        finishS1();
+      }
+    };
+  /* =========================
+     前の4人へ
+  ========================= */
+  if(s1i>0){
+    document
+      .getElementById('back')
+      .onclick=()=>{
+        /*
+          現在の選択を保存
+        */
+        s1Choices[s1i]=
+          new Set(
+            s1Selected
+          );
+        /*
+          1つ前へ
+        */
+        s1i--;
+        /*
+          前の選択を復元
+        */
+        renderS1();
+      };
+  }
+}
+/* ==================================================
+   STEP1終了
+   71人 → 36人
+================================================== */
+function finishS1(){
+  /*
+    一度スコアをリセット
+  */
+  scores=
+    new Map(
+      items.map(
+        x=>[x.id,0]
+      )
+    );
+  /*
+    最終的な選択内容から
+    スコアを計算
+  */
+  s1Choices.forEach(
+    choice=>{
+      choice.forEach(
+        id=>{
+          scores.set(
+            id,
+            scores.get(id)+1
+          );
+        }
+      );
+    }
+  );
+  /*
+    何人が1回以上選ばれたか
+  */
   const selectedCount=
     items.filter(
-      x=>scores.get(x.id)>0
+      x=>
+        scores.get(x.id)>0
     ).length;
-
-
-  if(selectedCount<18){
-
+  /* =========================
+     18人未満
+  ========================= */
+  if(
+    selectedCount<18
+  ){
     app.innerHTML=`
-
       <div class="stage">
         もう一度チャレンジ！
       </div>
-
       <p class="instruction">
         STEP1で選ばれた人数が
         <b>${selectedCount}人</b>
-        でした。<br><br>
-        18人以上選ばれる必要があります。
+        でした。
+        <br><br>
+        18人以上
+        選ばれる必要があります。
       </p>
-
       <div class="actions">
         <button id="restart">
           最初からやり直す
         </button>
       </div>
-
     `;
-
-    document.getElementById('restart').onclick=()=>{
-      start();
-      renderS1();
-    };
-
+    document
+      .getElementById('restart')
+      .onclick=()=>{
+        start();
+      };
     return;
   }
-
-
-  // 上位36人
+  /* =========================
+     スコア順に並べる
+  ========================= */
   const ranked=
     shuffle(items).sort(
       (a,b)=>
         scores.get(b.id)-
         scores.get(a.id)
     );
-
-
-  const top36=ranked.slice(0,36);
-
+  /*
+    上位36人
+  */
+  const top36=
+    ranked.slice(0,36);
+  /* =========================
+     4人ずつ9グループ
+  ========================= */
   s2Groups=[];
-
-  for(let i=0;i<36;i+=4){
-
+  for(
+    let i=0;
+    i<36;
+    i+=4
+  ){
     s2Groups.push(
       top36.slice(i,i+4)
     );
-
   }
-
   s2i=0;
   s2First=null;
   s2Results=[];
-
   renderS2First();
-
 }
-
-/* =========================
+/* ==================================================
    STEP2
    36人 → 18人
-========================= */
-
+================================================== */
 function renderS2First(){
-
-  const g=s2Groups[s2i];
-
+  const g=
+    s2Groups[s2i];
   progress(
-    25+s2i/9*25,
+    25+
+    s2i/9*25,
     50
   );
-
-
   app.innerHTML=`
-
     <div class="stage">
       STEP 2 / 3
     </div>
-
     <p class="instruction">
       この4人の中から
       <b>1位</b>
       を選んでください
     </p>
-
     <div class="grid">
-      ${g.map(x=>card(x)).join('')}
+      ${
+        g.map(
+          x=>card(x)
+        ).join('')
+      }
     </div>
-
     <div class="actions">
-
       <button id="back">
         STEP1に戻る
       </button>
-
     </div>
-
   `;
-
-
-  document.querySelectorAll('.card')
-  .forEach(el=>{
-
-    el.onclick=()=>{
-
-      s2First=
-        g.find(
-          x=>x.id==el.dataset.id
-        );
-
-      renderS2Second();
-
+  /*
+    1位選択
+  */
+  document
+    .querySelectorAll('.card')
+    .forEach(el=>{
+      el.onclick=()=>{
+        s2First=
+          g.find(
+            x=>
+              x.id==
+              el.dataset.id
+          );
+        renderS2Second();
+      };
+    });
+  /*
+    STEP1へ戻る
+  */
+  document
+    .getElementById('back')
+    .onclick=()=>{
+      /*
+        現在のSTEP1の選択を
+        保持したまま戻る
+        STEP1の最後のグループを表示
+      */
+      s1i=
+        s1Groups.length-1;
+      renderS1();
     };
-
-  });
-
-
-  document.getElementById('back')
-  .onclick=()=>{
-
-    start();
-
-  };
-
 }
-
-
-/* =========================
+/* ==================================================
    STEP2
    2位選択
-========================= */
-
+================================================== */
 function renderS2Second(){
-
   const rem=
-    s2Groups[s2i]
-    .filter(
-      x=>x.id!==s2First.id
+    s2Groups[s2i].filter(
+      x=>
+        x.id!==s2First.id
     );
-
-
   app.innerHTML=`
-
     <div class="stage">
       STEP 2 / 3
     </div>
-
     <p class="instruction">
       残り3人から
       <b>2位</b>
       を選んでください
     </p>
-
     <div class="grid">
-      ${rem.map(x=>card(x)).join('')}
+      ${
+        rem.map(
+          x=>card(x)
+        ).join('')
+      }
     </div>
-
     <div class="actions">
-
       <button id="back">
         1位選択に戻る
       </button>
-
     </div>
-
   `;
-
-
-  document.querySelectorAll('.card')
-  .forEach(el=>{
-
-    el.onclick=()=>{
-
-      s2Results.push(
-        s2First,
-        rem.find(
-          x=>x.id==el.dataset.id
-        )
-      );
-
-      s2i++;
-
-      s2First=null;
-
-
-      if(s2i<9){
-
-        renderS2First();
-
-      }else{
-
-        startFinal();
-
-      }
-
+  /*
+    2位選択
+  */
+  document
+    .querySelectorAll('.card')
+    .forEach(el=>{
+      el.onclick=()=>{
+        s2Results.push(
+          s2First,
+          rem.find(
+            x=>
+              x.id==
+              el.dataset.id
+          )
+        );
+        s2i++;
+        s2First=null;
+        if(
+          s2i<9
+        ){
+          renderS2First();
+        }else{
+          startFinal();
+        }
+      };
+    });
+  /*
+    1位選択へ戻る
+  */
+  document
+    .getElementById('back')
+    .onclick=()=>{
+      renderS2First();
     };
-
-  });
-
-
-  document.getElementById('back')
-  .onclick=()=>{
-
-    renderS2First();
-
-  };
-
 }
-
-
-/* =========================
+/* ==================================================
    STEP3
-========================= */
-
-function makeMatches(cands,rounds=4){
-
+   18人 → TOP9
+================================================== */
+function makeMatches(
+  cands,
+  rounds=4
+){
   const target=
-    cands.length*rounds/2;
-
+    cands.length*
+    rounds/2;
   let matches=[];
   let used=new Set();
   let tries=0;
-
-
+  /*
+    なるべく同じ組み合わせが
+    重複しないように作る
+  */
   while(
     matches.length<target &&
     tries++<2000
   ){
-
-    const a=shuffle(cands);
-
+    const a=
+      shuffle(cands);
     let pairs=[];
     let ok=true;
-
-
-    for(let i=0;i<a.length;i+=2){
-
+    for(
+      let i=0;
+      i<a.length;
+      i+=2
+    ){
       const x=a[i];
       const y=a[i+1];
-
-
       const key=[
-        Math.min(x.id,y.id),
-        Math.max(x.id,y.id)
+        Math.min(
+          x.id,
+          y.id
+        ),
+        Math.max(
+          x.id,
+          y.id
+        )
       ].join('-');
-
-
-      if(used.has(key)){
-
+      if(
+        used.has(key)
+      ){
         ok=false;
         break;
-
       }
-
-
       pairs.push({
         a:x,
         b:y,
         key:key
       });
-
     }
-
-
     if(ok){
-
       pairs.forEach(p=>{
-
         used.add(p.key);
-
         matches.push({
           a:p.a,
           b:p.b
         });
-
       });
-
     }
-
   }
-
-
+  /*
+    万一作れなかった場合の
+    最終補完
+  */
+  while(
+    matches.length<target
+  ){
+    const a=
+      shuffle(cands);
+    for(
+      let i=0;
+      i<a.length &&
+      matches.length<target;
+      i+=2
+    ){
+      matches.push({
+        a:a[i],
+        b:a[i+1]
+      });
+    }
+  }
   return shuffle(matches);
-
 }
-
-
+/* ==================================================
+   STEP3開始
+================================================== */
 function startFinal(){
-
-  finalCandidates=s2Results;
-
-  finalWins=new Map(
-    finalCandidates.map(
-      x=>[x.id,0]
-    )
-  );
-
+  finalCandidates=
+    s2Results;
+  finalWins=
+    new Map(
+      finalCandidates.map(
+        x=>[x.id,0]
+      )
+    );
   finalMatches=
     makeMatches(
       finalCandidates,
       4
     );
-
   finalI=0;
-
   renderFinal();
-
 }
-
-
-/* =========================
-   STEP3
-========================= */
-
+/* ==================================================
+   STEP3画面
+================================================== */
 function renderFinal(){
-
-  if(finalI>=finalMatches.length){
-
+  if(
+    finalI>=
+    finalMatches.length
+  ){
     finishFinal();
     return;
-
   }
-
-
   const m=
     finalMatches[finalI];
-
-
   progress(
     50+
-    finalI/finalMatches.length*50,
+    finalI/
+    finalMatches.length*
+    50,
     100
   );
-
-
   app.innerHTML=`
-
     <div class="stage">
       STEP 3 / 3
     </div>
-
     <p class="instruction">
-
       どちらが好き？
-
       <b>
         ${finalI+1}
         /
         ${finalMatches.length}
       </b>
-
     </p>
-
     <div class="grid">
-
       ${card(m.a)}
       ${card(m.b)}
-
     </div>
-
     <div class="notice">
-      18候補がそれぞれ4回ずつ対戦します
+      18候補が
+      それぞれ4回ずつ
+      対戦します
     </div>
-
   `;
-
-
-  document.querySelectorAll('.card')
-  .forEach(el=>{
-
-    el.onclick=()=>{
-
-      const id=
-        +el.dataset.id;
-
-      finalWins.set(
-        id,
-        finalWins.get(id)+1
-      );
-
-      finalI++;
-
-      renderFinal();
-
-    };
-
-  });
-
+  document
+    .querySelectorAll('.card')
+    .forEach(el=>{
+      el.onclick=()=>{
+        const id=
+          +el.dataset.id;
+        finalWins.set(
+          id,
+          finalWins.get(id)+1
+        );
+        finalI++;
+        renderFinal();
+      };
+    });
 }
-
-
-/* =========================
+/* ==================================================
    結果
-========================= */
-
+================================================== */
 function finishFinal(){
-
   const result=
-    shuffle(finalCandidates)
+    shuffle(
+      finalCandidates
+    )
     .sort(
       (a,b)=>
         finalWins.get(b.id)-
         finalWins.get(a.id)
     )
     .slice(0,9);
-
-
-  progress(100,100);
-
-
+  progress(
+    100,
+    100
+  );
   /*
-
+    
+    写真配置
     4位 5位 6位
     2位 1位 3位
     7位 8位 9位
-
   */
-
   const photoOrder=[
     3,4,5,
     1,0,2,
     6,7,8
   ];
-
-
   app.innerHTML=`
-
     <div class="stage">
       🎉 あなたのTOP9 🎉
     </div>
-
     <p class="instruction">
       あなたが選んだTOP9はこちら！
     </p>
-
-
     <div class="top9-photo-grid">
-
-      ${photoOrder.map(index=>{
-
-        const x=result[index];
-
-        return `
-
-          <div class="top9-photo">
-
-            <img
-              src="${x.image}"
-              onerror="imgError(this)"
-            >
-
-          </div>
-
-        `;
-
-      }).join('')}
-
+      ${
+        photoOrder.map(
+          index=>{
+            const x=
+              result[index];
+            return `
+              <div class="top9-photo">
+                <img
+                  src="${x.image}"
+                  onerror="imgError(this)"
+                >
+              </div>
+            `;
+          }
+        ).join('')
+      }
     </div>
-
-
     <div class="ranking-list">
-
-      ${result.map((x,i)=>`
-
-        <div class="ranking-item">
-
-          <span>
-            ${i+1}位
-          </span>
-
-          <span>
-            ${x.name}
-          </span>
-
-        </div>
-
-      `).join('')}
-
+      ${
+        result.map(
+          (x,i)=>`
+            <div class="ranking-item">
+              <span>
+                ${i+1}位
+              </span>
+              <span>
+                ${x.name}
+              </span>
+            </div>
+          `
+        ).join('')
+      }
     </div>
-
-
     <div class="actions">
-
       <button
         onclick="location.reload()"
       >
         もう一度やる
       </button>
-
     </div>
-
   `;
-
 }
-
-
+/* ==================================================
+   START
+================================================== */
 start();
-renderS1();
-
 </script>
+</body>
+</html>
