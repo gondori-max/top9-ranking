@@ -213,12 +213,24 @@ button.back-button{
 /* =========================
    候補者
 ========================= */
+const imageNumbers=[];
+
+for(let n=2815;n<=2903;n++){
+
+  if(n>=2828 && n<=2831){
+    continue;
+  }
+
+  imageNumbers.push(n);
+
+}
+
 const items=Array.from(
   {length:85},
   (_,i)=>({
     id:i+1,
     name:`候補 ${i+1}`,
-    image:`images/${String(i+1).padStart(3,'0')}.jpg`
+    image:`images/IMAGE_${imageNumbers[i]}.jpg`
   })
 );
 /* =========================
@@ -280,25 +292,55 @@ function shuffle(a){
    画像エラー
 ========================= */
 function imgError(img){
+
+  const extensions=[
+    '.JPG',
+    '.jpeg',
+    '.JPEG',
+    '.webp',
+    '.WEBP'
+  ];
+
+  let current=
+    img.src.split('/').pop();
+
+  let base=
+    current.substring(
+      0,
+      current.lastIndexOf('.')
+    );
+
+  let tried=
+    img.dataset.tried
+      ? Number(img.dataset.tried)
+      : 0;
+
+  if(tried<extensions.length){
+
+    img.dataset.tried=
+      tried+1;
+
+    img.src=
+      'images/'+
+      base+
+      extensions[tried];
+
+    return;
+  }
+
   img.onerror=null;
+
   img.src=
     'data:image/svg+xml;charset=UTF-8,'+
     encodeURIComponent(
       '<svg xmlns="http://www.w3.org/2000/svg" '+
       'viewBox="0 0 400 400">'+
-      '<rect '+
-      'width="400" '+
-      'height="400" '+
-      'fill="#eee"/>'+
-      '<text '+
-      'x="200" '+
-      'y="200" '+
+      '<rect width="400" height="400" fill="#eee"/>'+
+      '<text x="200" y="200" '+
       'text-anchor="middle" '+
       'dominant-baseline="middle" '+
-      'font-size="24" '+
-      'fill="#888">'+
-      '画像なし'+
-      '</text>'+
+      'font-size="24" fill="#888">'+
+      '画像なし</text>'+
       '</svg>'
     );
 }
