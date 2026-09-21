@@ -768,65 +768,112 @@ function finishS1(){
   const selectedCount=
     selected.length;
 
-   /*
-    18人未満ならやり直し
-  */
-  if(
-    selectedCount<18
-  ){
-    app.innerHTML=`
-      <div class="stage">
-        もう一度チャレンジ！
-      </div>
+/*
+  STEP1結果の名前
+*/
+const selectedNames=
+  selected
+    .map(x=>x.name)
+    .join('・');
 
-      <p class="instruction">
-        STEP1で選ばれた人数が
-        <b>${selectedCount}人</b>
-        でした。
-        <br><br>
-        18人以上
-        選ばれる必要があります。
-      </p>
+/*
+  18人未満の場合
+*/
+if(
+  selectedCount<18
+){
 
-      <div class="actions">
-        <button id="restart">
-          最初からやり直す
-        </button>
-      </div>
-    `;
+  app.innerHTML=`
 
-    document
-      .getElementById('restart')
-      .onclick=()=>{
-        start();
-      };
+    <div class="stage">
+      STEP 1 結果
+    </div>
 
-    return;
-  }
+    <p class="instruction">
 
-  /*
-    STEP2で使う人を保存
-  */
-  s2Results=
-    shuffle(selected);
+      <b>
+        18人以上選んでください
+      </b>
 
-  /*
-    STEP2の得点をリセット
-  */
-  s2Scores=
-    new Map(
-      selected.map(
-        x=>[x.id,0]
-      )
-    );
+      <br><br>
 
-  /*
-    STEP2を1回目から開始
-  */
-  s2Round=0;
+      ${selectedNames}
 
-  startS2Round();
+    </p>
+
+    <div class="actions">
+
+      <button id="restart">
+        最初からやり直す
+      </button>
+
+    </div>
+
+  `;
+
+  document
+    .getElementById('restart')
+    .onclick=()=>{
+      start();
+    };
+
+  return;
 }
+
+/*
+  18人以上の場合
+*/
+
+app.innerHTML=`
+
+  <div class="stage">
+    STEP 1 結果
+  </div>
+
+  <p class="instruction">
+
+    <b>
+      ${selectedCount}人を選びました！
+    </b>
+
+    <br><br>
+
+    ${selectedNames}
+
+  </p>
+
+  <div class="actions">
+
+    <button id="startStep2">
+      STEP2へ進む
+    </button>
+
+  </div>
+
+`;
+
+/*
+  STEP2へ進む
+*/
+document
+  .getElementById('startStep2')
+  .onclick=()=>{
+
+    s2Results=
+      shuffle(selected);
+
+    s2Scores=
+      new Map(
+        selected.map(
+          x=>[x.id,0]
+        )
+      );
+
+    s2Round=0;
+
+    startS2Round();
+
+  };
 /* ==================================================
    STEP2
    3回戦
