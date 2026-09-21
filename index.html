@@ -837,22 +837,67 @@ function finishS1(){
 }
 /* ==================================================
    STEP2
-   選ばれた人数 → 約半分
+   3回戦
+   1位＝2点
+   2位＝1点
 ================================================== */
+
+function startS2Round(){
+
+  /*
+    3回終了したら得点集計
+  */
+  if(
+    s2Round>=3
+  ){
+    finishS2();
+    return;
+  }
+
+  /*
+    毎回シャッフルして
+    新しい組み合わせを作る
+  */
+  const players=
+    shuffle(
+      s2Results
+    );
+
+  s2Groups=[];
+
+  for(
+    let i=0;
+    i<players.length;
+    i+=4
+  ){
+    s2Groups.push(
+      players.slice(i,i+4)
+    );
+  }
+
+  s2i=0;
+  s2First=null;
+
+  renderS2First();
+}
+
+
+/* ==================================================
+   1位選択
+================================================== */
+
 function renderS2First(){
 
   const g=
     s2Groups[s2i];
 
   /*
-    1人だけのグループの場合
-    その人をそのまま通過
+    最後が1人の場合
+    自動通過
   */
-  if(g.length===1){
-
-    s2Results.push(
-      g[0]
-    );
+  if(
+    g.length===1
+  ){
 
     s2i++;
 
@@ -862,7 +907,8 @@ function renderS2First(){
     ){
       renderS2First();
     }else{
-      startFinal();
+      s2Round++;
+      startS2Round();
     }
 
     return;
@@ -870,40 +916,65 @@ function renderS2First(){
 
   progress(
     25+
-    s2i/
-    s2Groups.length*
-    25,
+    (
+      (
+        s2Round/
+        3
+      )+
+      (
+        s2i/
+        s2Groups.length/
+        3
+      )
+    )*25,
     50
   );
 
   app.innerHTML=`
+
     <div class="stage">
       STEP 2 / 3
     </div>
 
     <p class="instruction">
+
+      第${s2Round+1}回戦
+
+      <br><br>
+
       この${g.length}人の中から
       <b>1位</b>
       を選んでください
+
+      <br>
+
+      <small>
+        1位：2点
+      </small>
+
     </p>
 
     <div class="grid">
+
       ${
         g.map(
           x=>card(x)
         ).join('')
       }
+
     </div>
 
     <div class="actions">
+
       <button id="back">
         STEP1に戻る
       </button>
+
     </div>
   `;
 
   /*
-    1位選択
+    1位を選択
   */
   document
     .querySelectorAll('.card')
@@ -918,7 +989,18 @@ function renderS2First(){
               +el.dataset.id
           );
 
+        /*
+          1位＝2点
+        */
+        s2Scores.set(
+          s2First.id,
+          s2Scores.get(
+            s2First.id
+          )+2
+        );
+
         renderS2Second();
+
       };
 
     });
@@ -937,10 +1019,12 @@ function renderS2First(){
 
     };
 }
+
+
 /* ==================================================
-   STEP2
    2位選択
 ================================================== */
+
 function renderS2Second(){
 
   const rem=
@@ -949,37 +1033,51 @@ function renderS2Second(){
         x.id!==s2First.id
     );
 
-  /*
-    残りが1人以上いる場合
-  */
   app.innerHTML=`
+
     <div class="stage">
       STEP 2 / 3
     </div>
 
     <p class="instruction">
+
+      第${s2Round+1}回戦
+
+      <br><br>
+
       残り${rem.length}人から
       <b>2位</b>
       を選んでください
+
+      <br>
+
+      <small>
+        2位：1点
+      </small>
+
     </p>
 
     <div class="grid">
+
       ${
         rem.map(
           x=>card(x)
         ).join('')
       }
+
     </div>
 
     <div class="actions">
+
       <button id="back">
         1位選択に戻る
       </button>
+
     </div>
   `;
 
   /*
-    2位選択
+    2位を選択
   */
   document
     .querySelectorAll('.card')
@@ -995,23 +1093,38 @@ function renderS2Second(){
           );
 
         /*
-          1位・2位を通過
+          2位＝1点
         */
-        s2Results.push(
-          s2First,
-          second
+        s2Scores.set(
+          second.id,
+          s2Scores.get(
+            second.id
+          )+1
         );
 
         s2i++;
+
         s2First=null;
 
+        /*
+          次のグループへ
+        */
         if(
           s2i<
           s2Groups.length
         ){
+
           renderS2First();
+
         }else{
-          startFinal();
+
+          /*
+            1回戦終了
+          */
+          s2Round++;
+
+          startS2Round();
+
         }
 
       };
@@ -1019,15 +1132,73 @@ function renderS2Second(){
     });
 
   /*
-    1位選択へ戻る
+    1位選択に戻る
   */
   document
     .getElementById('back')
     .onclick=()=>{
 
+      /*
+        1位の2点を取り消す
+      */
+      s2Scores.set(
+        s2First.id,
+        s2Scores.get(
+          s2First.id
+        )-2
+      );
+
       renderS2First();
 
     };
+}
+
+
+/* ==================================================
+   STEP2終了
+   得点上位9人をSTEP3へ
+================================================== */
+
+function finishS2(){
+
+  /*
+    得点順に並べる
+    同点ならランダム
+  */
+  const ranked=
+    shuffle(
+      s2Results
+    ).sort(
+      (a,b)=>
+        s2Scores.get(b.id)-
+        s2Scores.get(a.id)
+    );
+
+  /*
+    上位9人
+  */
+  finalCandidates=
+    ranked.slice(0,9);
+
+  /*
+    STEP3開始
+  */
+  finalWins=
+    new Map(
+      finalCandidates.map(
+        x=>[x.id,0]
+      )
+    );
+
+  finalMatches=
+    makeMatches(
+      finalCandidates,
+      4
+    );
+
+  finalI=0;
+
+  renderFinal();
 }
 /* ==================================================
    STEP3
