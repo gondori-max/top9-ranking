@@ -57,7 +57,7 @@ const items = Array.from({length:100},(_,i)=>({
 }));
 
 let shuffled=[], groups=[], g=0, selected=[];
-let stage1Score={}, stage2=[], pairs=[], pi=0, wins={};
+let stage1Score={}, stage2=[], finalCandidates=[], finalRank=[];
 
 function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
 function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
@@ -76,23 +76,23 @@ function showStage1(){
   if(g>=25){finishStage1();return}
   selected=[];
   const group=groups[g];
-  title(`STEP 1　${g+1} / 25`,`この4つから<strong>1〜3個</strong>選んでください`);
+  title(`STEP 1　${g+1} / 25`,`この4つから<strong>0〜4個</strong>選んでください`);
   bar(g/25*100);
   content(`<div class="options">${group.map((x,i)=>`
     <button class="opt" data-i="${i}" onclick="toggle(this)">
       ${img(x)}<span class="label">${esc(x.name)}</span>
     </button>`).join('')}</div>
     <div class="actions"><button class="primary" onclick="next1()">次へ</button></div>
-    <div class="hint">※1〜3個選択できます</div>`);
+    <div class="hint">※0〜4個選択できます（何も選ばず「次へ」もOK）</div>`);
 }
 function toggle(b){
   const i=+b.dataset.i;
   if(b.classList.contains('selected')){
     b.classList.remove('selected'); selected=selected.filter(x=>x!==i);
-  }else if(selected.length<3){b.classList.add('selected');selected.push(i)}
+  }else if(selected.length<4){b.classList.add('selected');selected.push(i)}
 }
 function next1(){
-  if(!selected.length){alert('1個以上選んでください');return}
+  // 0個選択でもそのまま次へ進めます
   selected.forEach(i=>stage1Score[groups[g][i].id]++);
   g++;showStage1();
 }
@@ -122,27 +122,33 @@ function pickSecond(id){
   g++;showStage2();
 }
 function finishStage2(){
-  pairs=[];wins={};stage2.forEach(x=>wins[x.id]=0);
-  for(let i=0;i<stage2.length;i++)for(let j=i+1;j<stage2.length;j++)pairs.push([stage2[i],stage2[j]]);
-  pi=0;showPair();
+  // 18候補から、好きな順に9個だけ選びます。
+  // 153回の一対一比較は行いません。
+  finalCandidates=[...stage2];
+  finalRank=[];
+  pickFinal();
 }
-function showPair(){
-  if(pi>=pairs.length){finish();return}
-  const [a,b]=pairs[pi];
-  title(`STEP 3　${pi+1} / ${pairs.length}`,`どちらが好き？`);
-  bar(pi/pairs.length*100);
-  content(`<div class="options">
-    <button class="opt" onclick="vote(${a.id})">${img(a)}<span class="label">${esc(a.name)}</span></button>
-    <button class="opt" onclick="vote(${b.id})">${img(b)}<span class="label">${esc(b.name)}</span></button>
-  </div><div class="hint">18個すべてを一対一で比較します</div>`);
+function pickFinal(){
+  if(finalRank.length>=9){finish();return}
+  const n=finalRank.length+1;
+  title(`STEP 3　${n} / 9`,`18候補の中から、あなたの<strong>${n}位</strong>を選んでください`);
+  bar(finalRank.length/9*100);
+  content(`<div class="options">${finalCandidates.map(x=>`
+    <button class="opt" onclick="pickFinalOne(${x.id})">${img(x)}<span class="label">${esc(x.name)}</span></button>`).join('')}</div>
+    <div class="hint">※選んだ候補は次の順位では表示されません</div>`);
 }
-function vote(id){wins[id]++;pi++;showPair()}
+function pickFinalOne(id){
+  const x=finalCandidates.find(x=>x.id===id);
+  if(!x)return;
+  finalRank.push(x);
+  finalCandidates=finalCandidates.filter(x=>x.id!==id);
+  pickFinal();
+}
 function finish(){
-  const rank=[...stage2].sort((a,b)=>wins[b.id]-wins[a.id]);
   document.getElementById('game').classList.add('hidden');
   document.getElementById('result').classList.remove('hidden');
-  document.getElementById('ranking').innerHTML=rank.slice(0,9).map((x,i)=>`
-    <div class="rank"><div class="num">${i+1}</div>${img(x)}<div class="name">${esc(x.name)}</div><div class="wins">${wins[x.id]}勝</div></div>`).join('');
+  document.getElementById('ranking').innerHTML=finalRank.map((x,i)=>`
+    <div class="rank"><div class="num">${i+1}</div>${img(x)}<div class="name">${esc(x.name)}</div></div>`).join('');
 }
 function title(a,b){document.getElementById('stageTitle').innerHTML=`<h2>${a}</h2><p class="sub">${b}</p>`}
 function bar(v){document.getElementById('bar').style.width=v+'%'}
