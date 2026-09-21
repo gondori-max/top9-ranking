@@ -1183,10 +1183,9 @@ function finishS2(){
     );
 
   finalMatches=
-    makeMatches(
-      finalCandidates,
-      4
-    );
+  makeMatches(
+    finalCandidates
+  );
 
   finalI=0;
 
@@ -1196,10 +1195,25 @@ function finishS2(){
    STEP3
    18人 → TOP9
 ================================================== */
-function makeMatches(
-  cands,
-  rounds=4
-){
+function makeMatches(cands){
+
+  const matches=[];
+
+  for(let i=0;i<cands.length;i++){
+
+    for(let j=i+1;j<cands.length;j++){
+
+      matches.push({
+        a:cands[i],
+        b:cands[j]
+      });
+
+    }
+
+  }
+
+  return shuffle(matches);
+}
 
   const matches=[];
   const used=new Set();
@@ -1286,9 +1300,10 @@ function renderFinal(){
       ${card(m.b)}
     </div>
     <div class="notice">
-  ${finalCandidates.length}候補が
-  それぞれ4回ずつ
-  対戦します
+  ${finalCandidates.length}人全員が
+  お互いに1回ずつ対戦します
+  <br>
+  全${finalMatches.length}試合
 </div>
   `;
   document
