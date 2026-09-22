@@ -1403,9 +1403,94 @@ function finishFinal(){
   `;
 }
 /* ==================================================
+   START画面
+================================================== */
+function showStartPage(){
+  progress(0,100);
+  app.innerHTML=`
+    <div
+      style="
+        text-align:center;
+        padding:30px 10px 10px;
+      "
+    >
+      <h2
+        style="
+          font-size:26px;
+          margin:10px 0 8px;
+        "
+      >
+        LDH好き顔9選
+      </h2>
+      <p
+        style="
+          font-size:22px;
+          font-weight:700;
+          margin:0 0 28px;
+        "
+      >
+        START！
+      </p>
+      <div
+        style="
+          text-align:left;
+          background:#fff;
+          border-radius:14px;
+          padding:16px;
+          font-size:11px;
+          line-height:1.8;
+          color:#777;
+          margin-bottom:24px;
+        "
+      >
+        <div
+          style="
+            font-weight:700;
+            font-size:12px;
+            margin-bottom:6px;
+            color:#555;
+          "
+        >
+          当サイトについて
+        </div>
+        当サイトは、LDH所属アーティストを応援する
+        ファンが個人的に制作した、非公式の
+        ファンコンテンツです。
+        <br><br>
+        LDH JAPANおよび各所属アーティスト・
+        グループとは一切関係ありません。
+        また、特定の人物・グループ等の公式な
+        人気順位や評価を示すものではなく、
+        当サイトを利用する方が個人的に楽しむ
+        ことを目的としたコンテンツです。
+        <br><br>
+        当サイトに掲載している画像・名称等について、
+        各権利者の権利を尊重しております。
+        <br><br>
+        当サイトは営利目的で運営しておらず、
+        広告掲載・商品販売等も行っておりません。
+        <br><br>
+        なお、当サイトの内容について、
+        LDH JAPANその他の権利者による
+        公式な承認・協力・推奨等を受けたものではありません。
+      </div>
+      <div class="actions">
+        <button id="startGame">
+          次へ
+        </button>
+      </div>
+    </div>
+  `;
+  document
+    .getElementById('startGame')
+    .onclick=()=>{
+      start();
+    };
+}
+/* ==================================================
    START
 ================================================== */
-start();
+showStartPage();
 </script>
 </body>
 </html>
