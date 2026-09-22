@@ -218,69 +218,105 @@ button.back-button{
 
 function getImageInfo(n){
 
-  // 2815〜2820
-  if(n>=2815 && n<=2820){
-    return {
-      prefix:'IMAGE_',
-      ext:'.jpg'
-    };
-  }
-
-  // 2821〜2825（2824を除く）
-  if(
-    n>=2821 &&
-    n<=2825 &&
-    n!==2824
-  ){
-    return {
-      prefix:'IMG_',
-      ext:'.WEBP'
-    };
-  }
-
-  // 2877〜2881
-  if(n>=2877 && n<=2881){
-    return {
-      prefix:'IMG_',
-      ext:'.WEBP'
-    };
-  }
-
-  // 2832〜2837
-  if(n>=2832 && n<=2837){
-    return {
-      prefix:'IMG_',
-      ext:'.jpg'
-    };
-  }
-
-  // 2900〜2903
-  if(n>=2900 && n<=2903){
-    return {
-      prefix:'IMG_',
-      ext:'.jpg'
-    };
-  }
-
-  // その他
   return {
-    prefix:'IMG_',
-    ext:'.JPG'
+    prefix:'',
+    ext:'.jpg'
   };
+
 }
 
 
-const imageNumbers=[];
+/* =========================
+   画像ファイル名
+========================= */
 
+function getImageInfo(n){
+
+  return {
+    prefix:'',
+    ext:'.jpg'
+  };
+
+}
+
+
+/* =========================
+   画像ファイル名
+========================= */
+
+const imageFiles=[];
+
+
+/*
+  元の85枚の順番を作成
+*/
 for(let n=2815;n<=2903;n++){
 
   if(n>=2828 && n<=2831){
     continue;
   }
 
-  imageNumbers.push(n);
+  imageFiles.push(
+    `${n}.jpg`
+  );
+
 }
 
+
+/*
+  2815〜2820を変更
+*/
+imageFiles.splice(
+  0,
+  6,
+  'IMG-2930.jpg',
+  'IMG-2928.jpg',
+  'IMG-2926.jpg',
+  'IMG-2925.jpg',
+  'IMG-2927.jpg',
+  'IMG-2929.jpg'
+);
+
+
+/*
+  2832〜2837を変更
+*/
+const index2832=
+  imageFiles.indexOf(
+    '2832.jpg'
+  );
+
+imageFiles.splice(
+  index2832,
+  6,
+  '2832 2.jpg',
+  '2833 2.jpg',
+  '2834 2.jpg',
+  '2835 2.jpg',
+  '2836 2.jpg',
+  '2837 2.jpg'
+);
+
+
+/*
+  2883〜2889を変更
+*/
+const index2883=
+  imageFiles.indexOf(
+    '2883.jpg'
+  );
+
+imageFiles.splice(
+  index2883,
+  7,
+  '2931.jpg',
+  '2932.jpg',
+  '2933.jpg',
+  '2934.jpg',
+  '2935.jpg',
+  '2936.jpg',
+  '2937.jpg'
+);
 
 const names=[
   'EXILE AKIRA',
@@ -374,14 +410,11 @@ const items=Array.from(
   {length:85},
   (_,i)=>{
 
-    const n=imageNumbers[i];
-    const info=getImageInfo(n);
-
     return {
       id:i+1,
       name:names[i],
       image:
-        `images/${info.prefix}${n}${info.ext}`
+        `images/${imageFiles[i]}`
     };
 
   }
