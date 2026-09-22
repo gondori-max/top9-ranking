@@ -1476,16 +1476,40 @@ function finishFinal(){
     <div class="top9-photo-grid">
       ${
         photoOrder.map(
-          index=>{
-            const x=
-              result[index];
-            return `
-              <div class="top9-photo">
-                <img
-                  src="${x.image}"
-                  onerror="imgError(this)"
-                >
-              </div>
+
+  index=>{
+
+    const x=
+
+      result[index];
+
+    const rank=
+
+      result.indexOf(x)+1;
+
+    return `
+
+      <div class="top9-photo result-photo">
+
+        <div class="result-rank ${
+
+          rank<=3 ? 'top3' : ''
+
+        }">
+
+          ${rank}位
+
+        </div>
+
+        <img
+
+          src="${x.image}"
+
+          onerror="imgError(this)"
+
+        >
+
+      </div>
             `;
           }
         ).join('')
