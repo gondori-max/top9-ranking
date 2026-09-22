@@ -213,102 +213,149 @@ button.back-button{
 </div>
 <script>
 /* =========================
-   候補者
-========================= */
-
-function getImageInfo(n){
-
-  return {
-    prefix:'',
-    ext:'.jpg'
-  };
-
-}
-
-
-/* =========================
    画像ファイル名
 ========================= */
 
 function getImageInfo(n){
 
-  return {
-    prefix:'',
-    ext:'.jpg'
-  };
+  // 2815〜2820
+  if(n>=2815 && n<=2820){
+    return {
+      prefix:'IMAGE_',
+      ext:'.jpg'
+    };
+  }
 
+  // 2821〜2825（2824を除く）
+  if(
+    n>=2821 &&
+    n<=2825 &&
+    n!==2824
+  ){
+    return {
+      prefix:'IMG_',
+      ext:'.WEBP'
+    };
+  }
+
+  // 2877〜2881
+  if(n>=2877 && n<=2881){
+    return {
+      prefix:'IMG_',
+      ext:'.WEBP'
+    };
+  }
+
+  // 2832〜2837
+  if(n>=2832 && n<=2837){
+    return {
+      prefix:'IMG_',
+      ext:'.jpg'
+    };
+  }
+
+  // 2900〜2903
+  if(n>=2900 && n<=2903){
+    return {
+      prefix:'IMG_',
+      ext:'.jpg'
+    };
+  }
+
+  // その他
+  return {
+    prefix:'IMG_',
+    ext:'.JPG'
+  };
 }
 
 
 /* =========================
-   画像ファイル名
+   元の画像順
 ========================= */
 
-const imageFiles=[];
+const imageNumbers=[];
 
-
-/*
-  元の85枚の順番を作成
-*/
 for(let n=2815;n<=2903;n++){
 
   if(n>=2828 && n<=2831){
     continue;
   }
 
-  imageFiles.push(
-    `${n}.jpg`
-  );
+  imageNumbers.push(n);
 
 }
 
 
-/*
-  2815〜2820を変更
-*/
+/* =========================
+   元のファイル名を作成
+========================= */
+
+const imageFiles=
+  imageNumbers.map(n=>{
+
+    const info=
+      getImageInfo(n);
+
+    return (
+      info.prefix+
+      n+
+      info.ext
+    );
+
+  });
+
+
+/* =========================
+   2815〜2820を変更
+========================= */
+
 imageFiles.splice(
   0,
   6,
+
   'IMG-2930.jpg',
   'IMG-2928.jpg',
   'IMG-2926.jpg',
   'IMG-2925.jpg',
   'IMG-2927.jpg',
   'IMG-2929.jpg'
+
 );
 
 
-/*
-  2832〜2837を変更
-*/
+/* =========================
+   2832〜2837を変更
+========================= */
+
 const index2832=
-  imageFiles.indexOf(
-    '2832.jpg'
-  );
+  imageNumbers.indexOf(2832);
 
 imageFiles.splice(
   index2832,
   6,
+
   '2832 2.jpg',
   '2833 2.jpg',
   '2834 2.jpg',
   '2835 2.jpg',
   '2836 2.jpg',
   '2837 2.jpg'
+
 );
 
 
-/*
-  2883〜2889を変更
-*/
+/* =========================
+   2883〜2889を変更
+========================= */
+
 const index2883=
-  imageFiles.indexOf(
-    '2883.jpg'
-  );
+  imageNumbers.indexOf(2883);
 
 imageFiles.splice(
   index2883,
   7,
+
   '2931.jpg',
   '2932.jpg',
   '2933.jpg',
@@ -316,6 +363,7 @@ imageFiles.splice(
   '2935.jpg',
   '2936.jpg',
   '2937.jpg'
+
 );
 
 const names=[
@@ -414,7 +462,7 @@ const items=Array.from(
       id:i+1,
       name:names[i],
       image:
-  `images/${imageFiles[i]}?`
+  `images/${imageFiles[i]}`
     };
 
   }
