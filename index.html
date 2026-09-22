@@ -527,6 +527,7 @@ let s2Results=[];
 
 let s2Round=0;
 let s2Scores=new Map();
+let s2PairCounts=new Map();
 /* =========================
    STEP3
 ========================= */
@@ -985,7 +986,9 @@ document
 
     s2Round=0;
 
-    startS2Round();
+s2PairCounts=new Map();
+
+startS2Round();
 
   };
 }
@@ -995,7 +998,125 @@ document
    1位＝2点
    2位＝1点
 ================================================== */
+/* ==================================================
+   STEP2
+   過去の組み合わせをなるべく避けて
+   4人グループを作る
+================================================== */
 
+function makeS2Groups(players){
+
+  let bestGroups=null;
+  let bestScore=Infinity;
+
+  /*
+    何通りかランダムに作って、
+    過去の組み合わせが少ないものを採用
+  */
+  for(let trial=0;trial<100;trial++){
+
+    const shuffled=
+      shuffle(players);
+
+    const groups=[];
+
+    for(
+      let i=0;
+      i<shuffled.length;
+      i+=4
+    ){
+
+      groups.push(
+        shuffled.slice(i,i+4)
+      );
+
+    }
+
+    let score=0;
+
+    /*
+      同じグループになったことがある
+      人同士の組み合わせを数える
+    */
+    groups.forEach(group=>{
+
+      for(let i=0;i<group.length;i++){
+
+        for(
+          let j=i+1;
+          j<group.length;
+          j++
+        ){
+
+          const a=
+            group[i].id;
+
+          const b=
+            group[j].id;
+
+          const key=
+            a<b
+              ? `${a}-${b}`
+              : `${b}-${a}`;
+
+          score+=
+            s2PairCounts.get(key)||0;
+
+        }
+
+      }
+
+    });
+
+    /*
+      一番重複が少ない組み合わせを保存
+    */
+    if(score<bestScore){
+
+      bestScore=score;
+      bestGroups=groups;
+
+    }
+
+  }
+
+  /*
+    今回の組み合わせを記録
+  */
+  bestGroups.forEach(group=>{
+
+    for(let i=0;i<group.length;i++){
+
+      for(
+        let j=i+1;
+        j<group.length;
+        j++
+      ){
+
+        const a=
+          group[i].id;
+
+        const b=
+          group[j].id;
+
+        const key=
+          a<b
+            ? `${a}-${b}`
+            : `${b}-${a}`;
+
+        s2PairCounts.set(
+          key,
+          (s2PairCounts.get(key)||0)+1
+        );
+
+      }
+
+    }
+
+  });
+
+  return bestGroups;
+}
 function startS2Round(){
 
   /*
@@ -1012,22 +1133,10 @@ function startS2Round(){
     毎回シャッフルして
     新しい組み合わせを作る
   */
-  const players=
-    shuffle(
-      s2Results
-    );
-
-  s2Groups=[];
-
-  for(
-    let i=0;
-    i<players.length;
-    i+=4
-  ){
-    s2Groups.push(
-      players.slice(i,i+4)
-    );
-  }
+  s2Groups=
+  makeS2Groups(
+    s2Results
+  );
 
   s2i=0;
   s2First=null;
