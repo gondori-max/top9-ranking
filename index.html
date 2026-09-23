@@ -338,6 +338,27 @@ const imageFiles=
 
   });
 
+  imageFiles.push(
+  'IMG_2947.jpg',
+  'IMG_2948.jpg',
+  'IMG_2949.jpg',
+  'IMG_2950.jpg',
+  'IMG_2951.jpg',
+  'IMG_2952.jpg',
+  'IMG_2953.jpg',
+  'IMG_2954.jpg',
+  'IMG_2955.jpg',
+  'IMG_2956.jpg',
+  'IMG_2957.jpg',
+  'IMG_2958.jpg',
+  'IMG_2959.jpg',
+  'IMG_2960.jpg',
+  'IMG_2961.jpg',
+  'IMG_2962.jpg',
+  'IMG_2964.jpg',
+  'IMG_2966.jpg'
+);
+
 
 /* =========================
    2815〜2820を変更
@@ -485,10 +506,28 @@ const names=[
   'SUZUKI',
   'GHEE',
   'HIROTO'
+    'KUBO-C',
+  'GS',
+  'P-CHO',
+  'SWAY',
+  'KAZUKI',
+  'EXILE MAKIDAI',
+  'EXILE ÜSA',
+  '松本利夫',
+  '青柳翔',
+  '小澤雄太',
+  '八木将康',
+  '佐藤寛太',
+  '櫻井佑樹',
+  '鈴木伸之',
+  '町田啓太',
+  '小野塚勇人',
+  '塩野瑛久',
+  '前田拳太郎'
 ];
 
 const items=Array.from(
-  {length:85},
+  {length:103},
   (_,i)=>{
 
     return {
@@ -1120,10 +1159,10 @@ function makeS2Groups(players){
 function startS2Round(){
 
   /*
-    5回終了したら得点集計
+    6回終了したら得点集計
   */
   if(
-    s2Round>=5
+    s2Round>=6
   ){
     finishS2();
     return;
@@ -1182,12 +1221,12 @@ function renderS2First(){
     (
       (
         s2Round/
-        5
+        6
       )+
       (
         s2i/
         s2Groups.length/
-        5
+        6
       )
     )*25,
     50
